@@ -20,11 +20,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Module Template Project"
-project_url = "https://eclipse-score.github.io/module_template/"
-project_prefix = "MODULE_TEMPLATE_"
+project = "CentOS AutoSD 9 Development Target"
+project_url = "https://github.com/eclipse-score/inc_os_autosd"
+project_prefix = "os_autosd_"
 author = "S-CORE"
-version = "0.1"
+version = "0.0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

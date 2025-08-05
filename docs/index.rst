@@ -12,10 +12,10 @@
    # SPDX-License-Identifier: Apache-2.0
    # *******************************************************************************
 
-Module Template Documentation
-=============================
+CentOS AutoSD 9 Development Target
+==================================
 
-This documentation describes the structure, usage and configuration of the Bazel-based C++/Rust module template.
+This documentation describes the structure, usage and configuration of AutoSD in Eclipse S-CORE.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -24,45 +24,84 @@ This documentation describes the structure, usage and configuration of the Bazel
 Overview
 --------
 
+This repsotory provides the recommended setup to build and run S-CORE in an AutoSD image.
+
 This repository provides a standardized setup for projects using **C++** or **Rust** and **Bazel** as a build system.
 It integrates best practices for build, test, CI/CD and documentation.
 
 Requirements
 ------------
 
-.. stkh_req:: Example Functional Requirement
-   :id: stkh_req__docgen_enabled__example
-   :status: valid
-   :safety: QM
+.. stkh_req:: CentOS AutoSD 9 Development Target
+   :id: stkh_req__supported_platforms__autosd_dev
    :reqtype: Functional
-   :rationale: Ensure documentation builds are possible for all modules
-
+   :security: NO
+   :safety: QM
+   :rationale: CentOS AutoSD 9 is required as a development target.
+   :status: valid
 
 Project Layout
 --------------
 
-The module template includes the following top-level structure:
-
-- `src/`: Main C++/Rust sources
-- `tests/`: Unit and integration tests
-- `examples/`: Usage examples
-- `docs/`: Documentation using `docs-as-code`
-- `.github/workflows/`: CI/CD pipelines
++---------------------------------------------+------------------------------------------------------------+
+| File/Folder                                 | Description                                                |
++=============================================+============================================================+
+| ``README.md``                               | Repository short description and instructions              |
++---------------------------------------------+------------------------------------------------------------+
+| ``toolchain/``                              | Bazel toolchain to build modules using AutoSD's tooling    |
++---------------------------------------------+------------------------------------------------------------+
+| ``reference_integration/``                  | Tooling to run AutoSD in different targets, such as QEMU   |
++---------------------------------------------+------------------------------------------------------------+
+| ``docs/``                                   | Documentation                                              |
++---------------------------------------------+------------------------------------------------------------+
+| ``.github/workflows/``                      | CI/CD pipelines                                            |
++---------------------------------------------+------------------------------------------------------------+
+| ``.vscode/``                                | Recommended VS Code settings                               |
++---------------------------------------------+------------------------------------------------------------+
+| ``.bazelrc``, ``MODULE.bazel``, ``BUILD``   | Bazel configuration & settings                             |
++---------------------------------------------+------------------------------------------------------------+
+| ``project_config.bzl``                      | Project-specific metadata for Bazel macros                 |
++---------------------------------------------+------------------------------------------------------------+
+| ``LICENSE``                                 | Licensing information                                      |
++---------------------------------------------+------------------------------------------------------------+
+| ``CONTRIBUTION.md``                         | Contribution guidelines                                    |
++---------------------------------------------+------------------------------------------------------------+
 
 Quick Start
 -----------
 
-To build the module:
+Documentation
+~~~~~~~~~~~~~
 
-.. code-block:: bash
+Documentation is dealt as a top level "folder" and bazel should be used to build it by running:
 
-   bazel build //src/...
+.. code-block:: shell
 
-To run tests:
+   bazel run //:docs 
 
-.. code-block:: bash
 
-   bazel test //tests/...
+You can then proceed to open ``_build/index.html`` in a web browser.
+
+In case you want to run a clean build from scratch, run the following command before triggering a new build:
+
+
+.. code-block:: shell
+
+   bazel clean --expunge && \
+   rm -rf .cache/ && \
+   rm MODULE.bazel.lock && \
+    rm -rf _build
+
+Toolchain
+~~~~~~~~~
+
+TBD
+
+
+Reference Integration
+~~~~~~~~~~~~~~~~~~~~~
+
+TBD
 
 Configuration
 -------------
@@ -74,8 +113,5 @@ Example:
 .. code-block:: python
 
    PROJECT_CONFIG = {
-       "asil_level": "QM",
-       "source_code": ["cpp", "rust"]
+       "asil_level": "QM"
    }
-
-This enables conditional behavior (e.g., choosing `clang-tidy` for C++ or `clippy` for Rust).

@@ -1,114 +1,85 @@
+# AutoSD Incubation Repository
 
-# C++ & Rust Bazel Template Repository
+This repository contains files to on-board AutoSD as a development target platform in Eclipse S-CORE.
 
-This repository serves as a **template** for setting up **C++ and Rust projects** using **Bazel**.
-It provides a **standardized project structure**, ensuring best practices for:
+## Project Structure
 
-- **Build configuration** with Bazel.
-- **Testing** (unit and integration tests).
-- **Documentation** setup.
-- **CI/CD workflows**.
-- **Development environment** configuration.
+| File/Folder                         | Description                                             |
+| ----------------------------------- | ------------------------------------------------------- |
+| `README.md`                         | Repository short description and instructions           |
+| `toolchain/`                        | Bazel toolchain to build modules using AutoSD's tooling |
+| `reference_integration/`            | Tooling to run AutoSD in different targets, such a QEMU |
+| `docs/`                             | Documentation                                           |
+| `.github/workflows/`                | CI/CD pipelines                                         |
+| `.vscode/`                          | Recommended VS Code settings                            |
+| `.bazelrc`, `MODULE.bazel`, `BUILD` | Bazel configuration & settings                          |
+| `project_config.bzl`                | Project-specific metadata for Bazel macros              |
+| `LICENSE`                           | Licensing information                                   |
+| `CONTRIBUTION.md`                   | Contribution guidelines                                 |
 
----
 
-## 📂 Project Structure
+## Getting Started
 
-| File/Folder                         | Description                                       |
-| ----------------------------------- | ------------------------------------------------- |
-| `README.md`                         | Short description & build instructions            |
-| `src/`                              | Source files for the module                       |
-| `tests/`                            | Unit tests (UT) and integration tests (IT)        |
-| `examples/`                         | Example files used for guidance                   |
-| `docs/`                             | Documentation (Doxygen for C++ / mdBook for Rust) |
-| `.github/workflows/`                | CI/CD pipelines                                   |
-| `.vscode/`                          | Recommended VS Code settings                      |
-| `.bazelrc`, `MODULE.bazel`, `BUILD` | Bazel configuration & settings                    |
-| `project_config.bzl`                | Project-specific metadata for Bazel macros        |
-| `LICENSE.md`                        | Licensing information                             |
-| `CONTRIBUTION.md`                   | Contribution guidelines                           |
-
----
-
-## 🚀 Getting Started
-
-### 1️⃣ Clone the Repository
+Clone the repository by running:
 
 ```sh
-git clone https://github.com/eclipse-score/YOUR_PROJECT.git
-cd YOUR_PROJECT
+git clone https://github.com/eclipse-score/inc_os_autosd.git
+cd inc_os_autosd
 ```
 
-### 2️⃣ Build the Examples of module
+A `Containerfile` is provided for convenience to run Bazel commands, build it by running:
 
-> DISCLAIMER: Depending what module implements, it's possible that different
-> configuration flags needs to be set on command line.
+NOTE: commands work with `docker` as well.
 
-To build all targets of the module the following command can be used:
+```
+podman build -t localhost/bazer:8.3.0 .
+``` 
 
-```sh
-bazel build //src/...
+You can then start the container by running:
+
+```
+podman run \
+-it \
+--rm \
+--name bazel \
+--userns keep-id \
+--workdir /workspace \
+--volume $PWD:/workspace:Z \
+--tmpfs /build \
+localhost/bazel:8.3.0 \
+/bin/bash
 ```
 
-This command will instruct Bazel to build all targets that are under Bazel
-package `src/`. The ideal solution is to provide single target that builds
-artifacts, for example:
+This will start a container mounting the current directory in `/workspace` and a tmpfs volume in `/build`
+that can be used for build caching.
 
-```sh
-bazel build //src/<module_name>:release_artifacts
+### Documentation
+
+Documentation is dealt as a top level "folder" and bazel should be used to build it by running:
+
+```
+bazel run //:docs 
 ```
 
-where `:release_artifacts` is filegroup target that collects all release
-artifacts of the module.
+You can then proceed to open `_build/index.html` in a web browser.
 
-> NOTE: This is just proposal, the final decision is on module maintainer how
-> the module code needs to be built.
+In case you want to run a clean build from scratch, run the following command before triggering a new build:
 
-### 3️⃣ Run Tests
-
-```sh
-bazel test //tests/...
+```
+bazel clean --expunge && \
+rm -rf .cache/ && \
+rm MODULE.bazel.lock && \
+rm -rf _build
 ```
 
----
+### Toolchain
 
-## 🛠 Tools & Linters
+Intructions to use files from the [toolchain](./toolchain) folder (TBD).
 
-The template integrates **tools and linters** from **centralized repositories** to ensure consistency across projects.
+### Reference Integration
 
-- **C++:** `clang-tidy`, `cppcheck`, `Google Test`
-- **Rust:** `clippy`, `rustfmt`, `Rust Unit Tests`
-- **CI/CD:** GitHub Actions for automated builds and tests
+Intructions to use files from the [reference_integration](./reference_integration) folder (TBD).
 
----
+## License
 
-## 📖 Documentation
-
-- A **centralized docs structure** is planned.
-
----
-
-## ⚙️ `project_config.bzl`
-
-This file defines project-specific metadata used by Bazel macros, such as `dash_license_checker`.
-
-### 📌 Purpose
-
-It provides structured configuration that helps determine behavior such as:
-
-- Source language type (used to determine license check file format)
-- Safety level or other compliance info (e.g. ASIL level)
-
-### 📄 Example Content
-
-```python
-PROJECT_CONFIG = {
-    "asil_level": "QM",  # or "ASIL-A", "ASIL-B", etc.
-    "source_code": ["cpp", "rust"]  # Languages used in the module
-}
-```
-
-### 🔧 Use Case
-
-When used with macros like `dash_license_checker`, it allows dynamic selection of file types
- (e.g., `cargo`, `requirements`) based on the languages declared in `source_code`.
+[Apache-2.0](./LICENSE)

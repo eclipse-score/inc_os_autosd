@@ -25,20 +25,14 @@ setup_starpls(
 copyright_checker(
     name = "copyright",
     srcs = [
-        "src",
-        "tests",
+        "Containerfile",
+        "reference_integration",
+        "toolchain",
         "//:BUILD",
         "//:MODULE.bazel",
     ],
     config = "@score_cr_checker//resources:config",
     template = "@score_cr_checker//resources:templates",
-    visibility = ["//visibility:public"],
-)
-
-dash_license_checker(
-    src = "//examples:cargo_lock",
-    file_type = "",  # let it auto-detect based on project_config
-    project_config = PROJECT_CONFIG,
     visibility = ["//visibility:public"],
 )
 

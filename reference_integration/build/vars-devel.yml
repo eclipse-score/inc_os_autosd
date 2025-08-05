@@ -10,10 +10,5 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
-cc_test(
-    name = "cpp_test_main",
-    srcs = ["test_main.cpp"],
-    deps = [
-        "@googletest//:gtest_main",  # GoogleTest dependency via Bazel Modules
-    ],
-)
+
+root_password: $6$xoLqEUz0cGGJRx01$H3H/bFm0myJPULNMtbSsOFd/2BnHqHkMD92Sfxd.EKM9hXTWSmELG8cf205l6dktomuTcgKGGtGDgtvHVXSWU.
