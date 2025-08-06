@@ -32,7 +32,7 @@ A `Containerfile` is provided for convenience to run Bazel commands, build it by
 NOTE: commands work with `docker` as well.
 
 ```
-podman build -t localhost/bazer:8.3.0 .
+podman build -t localhost/bazel:8.3.0 .
 ``` 
 
 You can then start the container by running:
