@@ -27,13 +27,20 @@ git clone https://github.com/eclipse-score/inc_os_autosd.git
 cd inc_os_autosd
 ```
 
-A `Containerfile` is provided for convenience to run Bazel commands, build it by running:
+A `Containerfile` is provided for convenience to run Bazel commands, build it on AMD64 by running:
 
 NOTE: commands work with `docker` as well.
 
 ```
 podman build -t localhost/bazel:8.3.0 .
-``` 
+```
+
+On a ARM64 machine you may need to specify the platform and make sure you are emulating an x86 VM to run it.
+
+```
+podman build --platform linux/amd64 -t localhost/bazel:8.3.0 .
+```
+
 
 You can then start the container by running:
 
