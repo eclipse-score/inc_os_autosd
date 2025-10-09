@@ -12,7 +12,12 @@ This folder contains files and tooling needed to build and run an AutoSD image i
 ## Building
 
 Note: Add `--define-file build/vars-devel.yml` to the build command if using for local development,
-which sets the root password to "password". 
+which sets the root password to "password".
+
+This folder provides two images:
+
+* `platform-execution.aib.yml`: a base image to run bazel and build components;
+* `platform-target.aib.yml`: an image to run components built in the exectuion platform (previous item).
 
 ### Bare Metal
 

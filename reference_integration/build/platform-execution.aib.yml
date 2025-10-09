@@ -11,35 +11,36 @@
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
 
-name: esdv-score
+name: esdv-score-bazel
 
 content:
-  repos: []
+  repos:
+    - id: epel
+      baseurl: https://dl.fedoraproject.org/pub/epel/$distro_version/Everything/$arch/
+    - id: bazel-copr
+      baseurl: https://download.copr.fedorainfracloud.org/results/lihaohong/bazel/epel-$distro_version-$arch/
   rpms:
+    - git
     - openssh-server
-    - podman
-    - bluechi-ctl
-    - bluechi-is-online
-    - hostname
-    - crun
-    - fuse-overlayfs
-
-qm:
-  memory_limit:
-    max: infinity
-    high: infinity
-  content:
-    enable_repos:
-      - debug
-    repos: []
-    rpms:
-      - git
+    - java-21-openjdk
+    - zip
+    - python3
+    - bazel7
+  make_dirs:
+    - path: /opt/score/src
+      mode: 0755
+      parents: true
+      exist_ok: true
+  add_files:
+    - path: /etc/tmpfiles.d/bazel.conf
+      text: |
+        L /usr/local/bin/bazel - - - - /usr/bin/bazel7
 
 image:
-  hostname: esdv-score-main-compute
+  hostname: esdv-score-bazel
   selinux_booleans:
     domain_can_mmap_files: true
-  image_size: 4 GiB
+  image_size: 10 GiB
   partitions:
     boot:
       size: 300 MiB
@@ -57,5 +58,3 @@ auth:
     guest:
       gid: 2000
 
-kernel:
-  debug_logging: true

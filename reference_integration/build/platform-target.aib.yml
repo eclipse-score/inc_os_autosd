@@ -1,0 +1,59 @@
+# *******************************************************************************
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+
+name: esdv-score
+
+content:
+  repos: []
+  rpms:
+    - openssh-server
+    - podman
+    - bluechi-ctl
+    - bluechi-is-online
+    - hostname
+    - crun
+    - fuse-overlayfs
+
+qm:
+  memory_limit:
+    max: infinity
+    high: infinity
+  content:
+    enable_repos:
+      - debug
+    repos: []
+    rpms:
+      - git
+
+image:
+  hostname: esdv-score-main-compute
+  selinux_booleans:
+    domain_can_mmap_files: true
+  image_size: 4 GiB
+  partitions:
+    boot:
+      size: 300 MiB
+    var:
+      relative_size: 0.3
+
+network:
+  static: {}
+
+auth:
+  sshd_config:
+    PasswordAuthentication: true
+    PermitRootLogin: true
+  groups:
+    guest:
+      gid: 2000
+

@@ -1,0 +1,2 @@
+build:autosd-x86_64 --platforms=//bazel_platforms/tier2:x86_64-linux-autosd
+build:autosd-aarch64 --platforms=//bazel_platforms/tier2:aarch64-linux-autosd
