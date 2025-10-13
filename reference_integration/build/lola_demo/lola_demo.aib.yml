@@ -1,0 +1,85 @@
+# *******************************************************************************
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+
+# Manifest file to build an AutoSD images with the score-communication application pre-installed
+
+name: lola_qm
+
+image:
+  selinux_mode: permissive
+
+content:
+  repos:
+    - id: epel
+      baseurl: https://dl.fedoraproject.org/pub/epel/9/Everything/$arch/
+    - id: score
+      baseurl: https://download.copr.fedorainfracloud.org/results/pingou/score-playground/epel-9-$arch/
+  rpms:
+    - vim-enhanced
+    - gdb
+    - strace
+    - score-baselibs
+    - score-communication
+    - score-communication-performance-benchmarks
+    - score-communication-examples
+    - tree
+    - dnf
+    # For testing the image only:
+    - openssh-server
+    - openssh-clients
+
+  make_dirs:
+    - path: /etc/containers/systemd/qm.container.d
+      mode: 0755
+      parents: true
+      exist_ok: true
+
+  # Configure shared socket directory via tmpfiles
+  add_files:
+    - path: /usr/lib/tmpfiles.d/lola_ipc.conf
+      text: |
+        # Lola shared memory segment folder
+        D! /dev/shm/lola_qm 0755 root root
+    - path: /usr/lib/tmpfiles.d/lola_disc.conf
+      text: |
+        # Lola service discovery folder
+        D! /tmp/mw_com_lola 0755 root root
+    - path: /etc/containers/systemd/qm.container.d/10-lola-ipc.conf
+      text: |
+        # Mount shared IPC directory for lola
+        [Container]
+        Volume=/dev/shm/lola_qm:/dev/shm/lola_qm
+        Volume=/tmp/mw_com_lola:/tmp/mw_com_lola
+
+  # Required for testing the image only:
+  systemd:
+    enabled_services:
+      # Enable ssh daemon
+      - sshd.service
+qm:
+  content:
+    repos:
+      - id: epel
+        baseurl: https://dl.fedoraproject.org/pub/epel/9/Everything/$arch/
+      - id: score
+        baseurl: https://download.copr.fedorainfracloud.org/results/pingou/score-playground/epel-9-$arch/
+    rpms:
+      - score-baselibs
+      - score-communication-examples
+      - score-communication
+
+auth:
+  # Required for testing the image only:
+  sshd_config:
+    PasswordAuthentication: true
+    PermitRootLogin: true
