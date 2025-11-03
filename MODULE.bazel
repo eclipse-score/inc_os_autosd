@@ -15,6 +15,8 @@ module(
     version = "0.0.1",
 )
 
+# Platform definitions
+bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_python", version = "1.4.1")
 
 PYTHON_VERSION = "3.12"
@@ -41,3 +43,10 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.2.0.2")
 
 #docs-as-code
 bazel_dep(name = "score_docs_as_code", version = "1.0.1")
+
+# AutoSD GCC Toolchains
+autosd_9_gcc = use_extension("//toolchain/autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
+use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
+
+autosd_10_gcc = use_extension("//toolchain/autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
