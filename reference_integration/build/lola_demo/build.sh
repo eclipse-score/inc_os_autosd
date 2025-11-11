@@ -32,7 +32,8 @@ if [ $image = true ]; then
   automotive-image-builder --verbose \
     build \
     --define-file ../vars-devel.yml \
-    --distro autosd9 \
+    --define-file ../vars.yml \
+    --distro autosd10 \
     --target qemu \
     --mode package \
     --build-dir=_build \

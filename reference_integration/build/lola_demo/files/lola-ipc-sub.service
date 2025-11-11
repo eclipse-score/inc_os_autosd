@@ -10,5 +10,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
+[Unit]
+Requires=bluechi-proxy@agent-main_lola-ipc-pub.service
+Description=LoLa IPC Subscriber
+After=network.target
 
-disable_ipv6: false
+[Service]
+WorkingDirectory=/usr/share/score-communication/examples/ipc_bridge/etc/
+ExecStart=/usr/bin/ipc_bridge_cpp --mode proxy --num-cycles 5 --cycle-time 1000 --service_instance_manifest mw_com_config.json
+Restart=on-failure
+RestartSec=5
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
