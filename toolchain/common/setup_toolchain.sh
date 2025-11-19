@@ -20,10 +20,31 @@ shift 3
 PACKAGES=("$@")
 
 USER_AGENT="Multi-GCC-Toolchain/1.0"
+MAX_RETRIES=3
+MAX_VERSION_INCREMENTS=1  # Try up to 1 patch version increments
 
 echo "Setting up toolchain from: $REPO_URL" >&2
 echo "Architecture: $ARCH" >&2
 echo "Packages: ${PACKAGES[*]}" >&2
+
+# Increment the patch version in an RPM filename
+# Example: kernel-headers-6.12.0-157.el10.x86_64.rpm -> kernel-headers-6.12.0-158.el10.x86_64.rpm
+increment_rpm_patch_version() {
+    local rpm_file="$1"
+    local increment="${2:-1}"
+
+    # Match pattern: name-version-release.arch.rpm
+    # Example: kernel-headers-6.12.0-157.el10.x86_64.rpm
+    if [[ "$rpm_file" =~ ^(.+-)([0-9]+)(\.[^.]+\.[^.]+\.rpm)$ ]]; then
+        local prefix="${BASH_REMATCH[1]}"
+        local patch_version="${BASH_REMATCH[2]}"
+        local suffix="${BASH_REMATCH[3]}"
+        local new_patch=$((patch_version + increment))
+        echo "${prefix}${new_patch}${suffix}"
+    else
+        echo "$rpm_file"
+    fi
+}
 
 download_package() {
     local pkg_name="$1"
@@ -86,8 +107,52 @@ download_package() {
 
     echo "[$pkg_name] Downloading: $rpm_file" >&2
 
-    if ! curl -L -A "$USER_AGENT" --max-time 180 --retry 2 -# -o "$rpm_file" "$rpm_url" 2>&1 | sed "s/^/[$pkg_name] /" >&2; then
-        echo "[$pkg_name] ERROR: Download failed" >&2
+    local download_success=false
+    local current_rpm_file="$rpm_file"
+    local current_rpm_url="$rpm_url"
+    local version_increment=0
+
+    # Try downloading, with version increment fallback for 404 errors
+    while [ $version_increment -le $MAX_VERSION_INCREMENTS ]; do
+        if [ $version_increment -gt 0 ]; then
+            current_rpm_file=$(increment_rpm_patch_version "$rpm_file" $version_increment)
+            # Update URL with new filename
+            current_rpm_url="${rpm_url%/*}/${current_rpm_file}"
+            echo "[$pkg_name] Trying incremented version: $current_rpm_file" >&2
+        fi
+
+        # Attempt download with --fail to get proper exit codes for HTTP errors
+        curl -L -A "$USER_AGENT" --max-time 180 --retry 2 --fail -# -o "$current_rpm_file" "$current_rpm_url" 2>&1 | sed "s/^/[$pkg_name] /" >&2
+        local curl_exit_code=${PIPESTATUS[0]}
+
+        if [ $curl_exit_code -eq 0 ]; then
+            download_success=true
+            rpm_file="$current_rpm_file"
+            if [ $version_increment -gt 0 ]; then
+                echo "[$pkg_name] Successfully downloaded newer version (patch +$version_increment)" >&2
+            fi
+            break
+        fi
+
+        # Exit code 22 means HTTP error (like 404)
+        if [ $curl_exit_code -eq 22 ] && [ $version_increment -lt $MAX_VERSION_INCREMENTS ]; then
+            echo "[$pkg_name] File not found (HTTP 404), trying next version..." >&2
+            version_increment=$((version_increment + 1))
+        else
+            # Other error or exhausted version increments
+            break
+        fi
+    done
+
+    if [ "$download_success" = false ]; then
+        echo "[$pkg_name] ERROR: Download failed after trying $((version_increment + 1)) version(s)" >&2
+        rm -f "$rpm_file" "$current_rpm_file"
+        return 1
+    fi
+
+    # Verify the downloaded file is a valid RPM
+    if ! rpm2cpio "$rpm_file" >/dev/null 2>&1; then
+        echo "[$pkg_name] ERROR: Downloaded file is not a valid RPM package" >&2
         rm -f "$rpm_file"
         return 1
     fi
@@ -131,11 +196,34 @@ if [ "$html_size" -eq 0 ]; then
     exit 1
 fi
 
+download_package_with_retry() {
+    local pkg="$1"
+    local html_page="$2"
+    local attempt=1
+
+    while [ $attempt -le $MAX_RETRIES ]; do
+        echo "[$pkg] Attempt $attempt of $MAX_RETRIES" >&2
+
+        if download_package "$pkg" "$html_page"; then
+            return 0
+        fi
+
+        if [ $attempt -lt $MAX_RETRIES ]; then
+            echo "[$pkg] Retrying in 2 seconds..." >&2
+            sleep 2
+        fi
+
+        attempt=$((attempt + 1))
+    done
+
+    return 1
+}
+
 echo "Downloading and extracting packages..." >&2
 for pkg in "${PACKAGES[@]}"; do
     echo "========================================" >&2
-    if ! download_package "$pkg" "$html_page"; then
-        echo "FATAL: Failed to process package: $pkg" >&2
+    if ! download_package_with_retry "$pkg" "$html_page"; then
+        echo "FATAL: Failed to process package: $pkg after $MAX_RETRIES attempts" >&2
         exit 1
     fi
 done
