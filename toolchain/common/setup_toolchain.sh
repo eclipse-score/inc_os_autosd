@@ -185,9 +185,9 @@ for tool in gcc g++ cpp ar ld ld.bfd objcopy strip objdump as nm gcov; do
 
     cat > "${tool_path}_wrapper" <<'WRAPPER_EOF'
 #!/bin/sh
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
-exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REPO_ROOT/usr/bin/TOOL_NAME_original" "$@"
+SCRIPT_DIR="$(/usr/bin/dirname "$(/usr/bin/readlink -f "$0")")"
+REPO_ROOT="$(/usr/bin/dirname "$(/usr/bin/dirname "$SCRIPT_DIR")")"
+exec /usr/bin/env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REPO_ROOT/usr/bin/TOOL_NAME_original" "$@"
 WRAPPER_EOF
 
     sed -i "s/TOOL_NAME/$tool/g" "${tool_path}_wrapper"
