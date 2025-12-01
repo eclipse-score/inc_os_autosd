@@ -38,6 +38,6 @@ if [ $image = true ]; then
     --mode package \
     --build-dir=_build \
     --export image \
-    lola_demo.aib.yml \
+    lola-demo.aib.yml \
     lola_demo.$arch.img
 fi
