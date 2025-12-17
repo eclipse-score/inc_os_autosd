@@ -37,10 +37,7 @@ pip.parse(
     python_version = PYTHON_VERSION,
     requirements_lock = "//feature_integration_tests/python_test_cases:requirements.txt.lock",
 )
-
 use_repo(pip, "pip_score_venv_test")
-
-# Special imports for certain modules
 
 # communication module dependencies
 # archive_override are not forwarded by bazel_dep, so we need to redefine it here
@@ -55,8 +52,8 @@ archive_override(
 bazel_dep(name = "trlc")
 git_override(
     module_name = "trlc",
-    remote = "https://github.com/bmw-software-engineering/trlc.git",
     commit = "650b51a47264a4f232b3341f473527710fc32669",  # trlc-2.0.2 release
+    remote = "https://github.com/bmw-software-engineering/trlc.git",
 )
 
 # imports for the feature showcase module
@@ -68,6 +65,6 @@ bazel_dep(name = "score_crates", version = "0.0.4")
 bazel_dep(name = "rules_rpm", version = "0.1.0")
 git_override(
     module_name = "rules_rpm",
-    remote = "https://github.com/bilelmoussaoui/bazel-rpm.git",
     branch = "main",
+    remote = "https://github.com/bilelmoussaoui/bazel-rpm.git",
 )
