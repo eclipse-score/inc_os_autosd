@@ -69,7 +69,7 @@ jobs:
           sshcmd() {
             sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 root@localhost $@
           }
-          ../../scripts/run_qemu disk.qcow2
+          ./scripts/run_qemu disk.qcow2
           sleep 5
           sshcmd 'cat /etc/os-release'
           sleep 10
@@ -78,4 +78,4 @@ jobs:
           sshcmd '/usr/bin/lola-ipc-test'
         env:
           SSH_PASSWORD: password
-        working-directory: reference_integration
+        working-directory: os_images
