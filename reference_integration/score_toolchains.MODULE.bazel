@@ -30,3 +30,8 @@ register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
 autosd_9_gcc = use_extension("@os_autosd_toolchain//autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
 use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
 register_toolchains("@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64")
+
+# Register the RPM toolchain
+rpm_toolchain = use_extension("@rules_rpm//toolchains:extensions.bzl", "rpm_toolchain")
+use_repo(rpm_toolchain, "rpm_toolchain")
+register_toolchains("@rules_rpm//toolchains:linux_x86_64")

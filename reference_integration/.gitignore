@@ -1,3 +1,7 @@
 _build/
 outputs/
-scripts/auto-image-builder.sh
+bazel-bin/
+bazel-out/
+bazel-reference_integration/
+bazel-testlogs/
+auto-image-builder.sh

@@ -71,8 +71,3 @@ git_override(
     remote = "https://github.com/bilelmoussaoui/bazel-rpm.git",
     branch = "main",
 )
-
-# Register the RPM toolchain
-rpm_toolchain = use_extension("@rules_rpm//toolchains:extensions.bzl", "rpm_toolchain")
-use_repo(rpm_toolchain, "rpm_toolchain")
-register_toolchains("@rules_rpm//toolchains:linux_x86_64")
