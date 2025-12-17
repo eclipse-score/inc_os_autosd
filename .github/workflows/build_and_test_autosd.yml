@@ -44,7 +44,7 @@ jobs:
           mkdir -p ../os_images/rpms
           find bazel-bin -type f -name "*.rpm" -exec cp {} ../os_images/rpms/ \;
           createrepo_c ../os_images/rpms/
-        working-directory: reference_integration 
+        working-directory: reference_integration
 
       - name: Build AutoSD Image
         uses: ./.github/actions/aib
