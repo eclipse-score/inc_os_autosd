@@ -81,11 +81,15 @@ rm -rf _build
 
 ### Toolchain
 
-Intructions to use files from the [toolchain](./toolchain) folder (TBD).
+Intructions to use files from the [toolchain](./toolchain) folder.
 
 ### Reference Integration
 
-Intructions to use files from the [reference_integration](./reference_integration) folder (TBD).
+Intructions to use files from the [reference_integration](./reference_integration) folder.
+
+### OS Images
+
+Intructions to use files from the [os_images](./os_images) folder.
 
 ## License
 

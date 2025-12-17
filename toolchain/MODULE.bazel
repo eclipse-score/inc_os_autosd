@@ -1,0 +1,30 @@
+module(
+    name = "os_autosd_toolchain",
+    version = "0.0.1",
+)
+
+# Platform definitions
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "rules_python", version = "1.4.1")
+
+PYTHON_VERSION = "3.12"
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = PYTHON_VERSION,
+)
+use_repo(python)
+
+# Checker rule for CopyRight checks/fixs
+bazel_dep(name = "score_cr_checker", version = "0.3.1")
+bazel_dep(name = "score_python_basics", version = "0.3.4")
+bazel_dep(name = "score_starpls_lsp", version = "0.1.0")
+
+# Dash license checker
+bazel_dep(name = "score_dash_license_checker", version = "0.1.2")
+
+# Format checker
+bazel_dep(name = "score_format_checker", version = "0.1.1")
+bazel_dep(name = "aspect_rules_lint", version = "1.4.4")
+bazel_dep(name = "buildifier_prebuilt", version = "8.2.0.2")

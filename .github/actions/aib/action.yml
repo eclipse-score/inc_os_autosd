@@ -51,13 +51,13 @@ runs:
     - name: Download builder script
       shell: bash
       run: |
-        curl -o /tmp/auto-image-builder.sh "https://gitlab.com/CentOS/automotive/src/automotive-image-builder/-/raw/main/auto-image-builder.sh"
+        curl -o /tmp/auto-image-builder.sh "https://gitlab.com/lrossett/automotive-image-builder/-/raw/script-fix/auto-image-builder.sh?ref_type=heads"
         chmod +x /tmp/auto-image-builder.sh
 
     - name: Build AIB image
       shell: bash
       run: |
-        sudo /tmp/auto-image-builder.sh build \
+        sudo /tmp/auto-image-builder.sh build-deprecated \
         --distro ${{ inputs.distro }} \
         --mode ${{ inputs.mode }} \
         --target ${{ inputs.target }} \
