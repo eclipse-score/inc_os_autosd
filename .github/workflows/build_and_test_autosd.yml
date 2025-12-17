@@ -36,23 +36,23 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y podman curl qemu-system
 
-      - name: Pre Build Actions
+      - name: Build and copy RPMs
         run: |
-          cp ../vars-devel.yml vars-devel.yml
-          cp ../vars.yml vars.yml
-        working-directory: reference_integration/build/lola_demo
+          bazel build --config=bl-config-linux-autosd //:lola-demo
+          find bazel-bin -type f -name "*.rpm" -exec cp {} ../os_images/rpms/ \;
+        working-directory: reference-integration 
 
       - name: Build AutoSD Image
         uses: ./.github/actions/aib
         with:
-          manifest: lola-demo.aib.yml
+          manifest: image.aib.yml
           distro: autosd10
           mode: package
           target: qemu
           export: qcow2
           extra_args: '--define-file vars-devel.yml --define-file vars.yml'
           disk_path: disk.qcow2
-          base_dir: reference_integration/build/lola_demo
+        working-directory: reference-integration
 
       - name: Enable KVM group perms
         run: |
@@ -74,4 +74,4 @@ jobs:
           sshcmd '/usr/bin/lola-ipc-test'
         env:
           SSH_PASSWORD: password
-        working-directory: reference_integration/build/lola_demo
+        working-directory: reference_integration

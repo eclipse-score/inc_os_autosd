@@ -1,0 +1,125 @@
+# *******************************************************************************
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+
+# Manifest file to build an AutoSD images with the score-communication 
+# application pre-installed
+
+name: lola_qm
+
+image:
+  selinux_mode: permissive
+
+content:
+  repos:
+    - id: epel
+      baseurl: https://dl.fedoraproject.org/pub/epel/9/Everything/$arch/
+    - id: score
+      baseurl: https://download.copr.fedorainfracloud.org/results/pingou/score-playground/epel-9-$arch/
+  rpms:
+    - vim-enhanced
+    - gdb
+    - strace
+    - score-baselibs
+    - score-communication-examples
+    - score-communication
+    - inc_orchestrator
+    - process_launcher
+    - holden_integration
+    - tree
+    - dnf
+    # For testing the image only:
+    - openssh-server
+    - openssh-clients
+
+  make_dirs:
+    - path: /etc/containers/systemd/qm.container.d
+      mode: 0755
+      parents: true
+      exist_ok: true
+
+  # Configure shared socket directory via tmpfiles
+  add_files:
+    - path: /usr/lib/tmpfiles.d/lola_ipc.conf
+      text: |
+        # Lola shared memory segment folder
+        D! /dev/shm/lola_qm 0755 root root
+    - path: /usr/lib/tmpfiles.d/lola_disc.conf
+      text: |
+        # Lola service discovery folder
+        D! /tmp/mw_com_lola 0755 root root
+    - path: /etc/containers/systemd/qm.container.d/10-lola-ipc.conf
+      text: |
+        # Mount shared IPC directory for lola
+        [Container]
+        Volume=/dev/shm/lola_qm:/dev/shm/lola_qm
+        Volume=/tmp/mw_com_lola:/tmp/mw_com_lola
+    - path: /usr/lib/tmpfiles.d/holden_ipc.conf
+      text: |
+        # Holden Process Orchestration IPC directory
+        # Named after 19th century puppeteer Joseph Holden
+        D! /run/holden 0755 root root
+    - path: /etc/containers/systemd/qm.container.d/10-holden-ipc.conf
+      text: |
+        # Mount shared IPC directory for Holden socket access
+        [Container]
+        Volume=/run/holden:/run/holden
+
+
+  # Required for testing the image only:
+  systemd:
+    enabled_services:
+      # Enable ssh daemon
+      - sshd.service
+qm:
+  content:
+    repos:
+      - id: epel
+        baseurl: https://dl.fedoraproject.org/pub/epel/9/Everything/$arch/
+      - id: score
+        baseurl: https://download.copr.fedorainfracloud.org/results/pingou/score-playground/epel-9-$arch/
+      - id: holden
+        baseurl: https://download.copr.fedorainfracloud.org/results/pingou/holden/centos-stream-9-$arch/
+    rpms:
+      - score-baselibs
+      - score-communication-examples
+      - score-communication
+      - holden-agent
+
+    # Create systemd override directory
+    make_dirs:
+      - path: /etc/systemd/system/holden-agent.service.d
+        mode: 0755
+        parents: true
+
+    # Configure holden-agent systemd service override
+    add_files:
+      - path: /etc/systemd/system/holden-agent.service.d/10-socket-path.conf
+        text: |
+          # Override socket path and permissions for Holden agent
+          [Service]
+          Environment=HOLDEN_SOCKET_PATH=/run/holden/qm_orchestrator.sock
+          # Run as root for cgroups access and socket creation
+          User=root
+          Group=root
+          # Add /run/holden to writable paths
+          ReadWritePaths=/tmp /var/lib/holden /var/run/holden /sys/fs/cgroup /run/holden
+
+    systemd:
+      enabled_services:
+        - holden-agent
+
+auth:
+  # Required for testing the image only:
+  sshd_config:
+    PasswordAuthentication: true
+    PermitRootLogin: true
