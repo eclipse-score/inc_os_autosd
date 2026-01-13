@@ -15,8 +15,6 @@ name: Build and Test AutoSD
 
 on:
   pull_request:
-    paths:
-      - 'reference_integration/**'
   workflow_dispatch:
 
 jobs:
@@ -42,7 +40,8 @@ jobs:
         run: |
           bazel build --config=bl-x86_64-linux-autosd //:lola-demo
           mkdir -p ../os_images/rpms
-          find bazel-bin -type f -name "*.rpm" -exec cp {} ../os_images/rpms/ \;
+          cp bazel-out/k8-fastbuild/bin/lola-demo-1.0.0-1.x86_64.rpm ../os_images/rpms/
+          cp bazel-out/k8-fastbuild/bin/lola-demo-1.0.0-1.src.rpm ../os_images/rpms/
           createrepo_c ../os_images/rpms/
         working-directory: reference_integration
 
