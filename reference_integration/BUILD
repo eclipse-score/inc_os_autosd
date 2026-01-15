@@ -10,7 +10,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
-load("@rules_rpm//rpm:defs.bzl", "rpm_package")
+load("@rules_rpm//:defs.bzl", "rpm_package")
 
 rpm_package(
     name = "lola-demo",

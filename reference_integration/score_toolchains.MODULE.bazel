@@ -16,6 +16,12 @@ local_path_override(
     module_name = "os_autosd_toolchain",
     path = "../toolchain"
 )
+bazel_dep(name = "rules_rpm", version = "0.0.1")
+# override with local path
+local_path_override(
+    module_name = "rules_rpm",
+    path = "../rpm"
+)
 # override with git
 #git_override(
 #    module_name = "os_autosd",
@@ -31,7 +37,10 @@ autosd_9_gcc = use_extension("@os_autosd_toolchain//autosd_9_gcc:extensions.bzl"
 use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
 register_toolchains("@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64")
 
-# Register the RPM toolchain
-rpm_toolchain = use_extension("@rules_rpm//toolchains:extensions.bzl", "rpm_toolchain")
-use_repo(rpm_toolchain, "rpm_toolchain")
-register_toolchains("@rules_rpm//toolchains:linux_x86_64")
+# Register the RPM toolchain (using local toolchain from parent)
+rpm_toolchain_ext = use_extension("@rules_rpm//toolchain:extensions.bzl", "rpm_toolchain")
+use_repo(rpm_toolchain_ext, "rpm_toolchain")
+register_toolchains(
+    "@rules_rpm//toolchain:linux_x86_64",
+    "@rules_rpm//toolchain:linux_aarch64",
+)

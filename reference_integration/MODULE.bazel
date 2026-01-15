@@ -60,11 +60,3 @@ git_override(
 bazel_dep(name = "rules_rust", version = "0.61.0")
 bazel_dep(name = "score_itf", version = "0.1.0")
 bazel_dep(name = "score_crates", version = "0.0.4")
-
-# RPM packaging support
-bazel_dep(name = "rules_rpm", version = "0.1.0")
-git_override(
-    module_name = "rules_rpm",
-    branch = "main",
-    remote = "https://github.com/bilelmoussaoui/bazel-rpm.git",
-)

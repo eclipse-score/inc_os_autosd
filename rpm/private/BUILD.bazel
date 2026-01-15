@@ -1,0 +1,39 @@
+# *******************************************************************************
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//:__subpackages__"])
+
+bzl_library(
+    name = "rpm_rule",
+    srcs = ["rpm_rule.bzl"],
+    deps = [
+        "@bazel_skylib//lib:paths",
+        "@bazel_skylib//lib:shell",
+    ],
+)
+
+filegroup(
+    name = "standard_package",
+    srcs = [
+        "BUILD.bazel",
+        "rpm_rule.bzl",
+        "//private/templates:all_templates",
+    ],
+)
+
+filegroup(
+    name = "templates",
+    srcs = ["//private/templates:all_templates"],
+    visibility = ["//:__subpackages__"],
+)
