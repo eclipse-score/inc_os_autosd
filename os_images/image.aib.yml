@@ -40,6 +40,7 @@ content:
     - bluechi-ctl
     # score
     - lola-demo
+    - persistency-demo
 
   make_dirs:
     - path: /etc/containers/systemd/qm.container.d
@@ -102,6 +103,7 @@ qm:
       - boost-devel
       - bluechi-agent
       - lola-demo
+      - persistency-demo
     add_files:
       # lola service files
       - path: /etc/systemd/system/lola-ipc-sub.service

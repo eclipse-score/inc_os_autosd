@@ -30,3 +30,19 @@ rpm_package(
     summary = "LOLA Demo",
     version = "1.0.0",
 )
+
+rpm_package(
+    name = "persistency-demo",
+    binaries = [
+        "//demos/persistency:kvs-cpp-demo",
+        "//demos/persistency:kvs-rust-demo",
+    ],
+    data = ["//demos/persistency:simple_demo.sh"],
+    data_dir = "/usr/share/persistency-demo",
+    description = "Comprehensive demonstration programs for Eclipse Score persistency Key-Value Storage (KVS) library showcasing capabilities through C++ and Rust implementations",
+    libraries = [
+        "@score_persistency//:kvs_cpp",
+    ],
+    summary = "Persistency KVS Demo",
+    version = "0.1.0",
+)

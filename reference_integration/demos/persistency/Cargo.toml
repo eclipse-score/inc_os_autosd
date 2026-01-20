@@ -1,0 +1,19 @@
+[package]
+name = "rust_demo"
+version = "0.1.0"
+edition = "2021"
+description = "Comprehensive demonstration program for the KVS Rust library"
+
+# This demo is a standalone package, not part of the workspace
+[workspace]
+
+[[bin]]
+name = "rust_demo"
+path = "rust_demo.rs"
+
+[dependencies]
+# Main KVS library - uses local copy in distribution tarball
+rust_kvs = { path = "../rust_kvs" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage_nightly)'] }
