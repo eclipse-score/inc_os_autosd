@@ -41,6 +41,7 @@ content:
     # score
     - lola-demo
     - persistency-demo
+    - holden-orchestrator-demo
 
   make_dirs:
     - path: /etc/containers/systemd/qm.container.d
@@ -64,6 +65,15 @@ content:
       text: |
         [Container]
         Volume=/run/bluechi:/run/bluechi
+    - path: /usr/lib/tmpfiles.d/holden_ipc.conf
+      text: |
+        # Holden Process Orchestration IPC directory
+        D! /run/holden 0755 root root
+    - path: /etc/containers/systemd/qm.container.d/12-holden-ipc.conf
+      text: |
+        # Mount shared IPC directory for Holden socket access
+        [Container]
+        Volume=/run/holden:/run/holden
     # bluechi files
     - path: /etc/bluechi/controller.conf.d/0-main.conf
       source_path: files/bluechi-controller.conf
@@ -104,6 +114,17 @@ qm:
       - bluechi-agent
       - lola-demo
       - persistency-demo
+      - holden-agent-demo
+
+    # Create systemd override directory for holden-agent
+    make_dirs:
+      - path: /etc/systemd/system/holden-agent.service.d
+        mode: 0755
+        parents: true
+      - path: /etc/holden
+        mode: 0755
+        parents: true
+
     add_files:
       # lola service files
       - path: /etc/systemd/system/lola-ipc-sub.service
@@ -111,9 +132,29 @@ qm:
       # bluechi files
       - path: /etc/bluechi/agent.conf.d/0-qm.conf
         source_path: files/bluechi-agent-qm.conf
+      # holden-agent files
+      - path: /usr/lib/sysusers.d/holden.conf
+        source_path: files/orchestrator/holden.sysusers
+      - path: /usr/lib/systemd/system/holden-agent.service
+        source_path: files/orchestrator/holden-agent.service
+      - path: /etc/holden/agent.conf
+        source_path: files/orchestrator/agent.conf
+      # holden-agent systemd override
+      - path: /etc/systemd/system/holden-agent.service.d/10-socket-path.conf
+        text: |
+          # Override socket path and permissions for Holden agent
+          [Service]
+          Environment=HOLDEN_SOCKET_PATH=/run/holden/qm_orchestrator.sock
+          # Run as root for cgroups access and socket creation
+          User=root
+          Group=root
+          # Add /run/holden to writable paths
+          ReadWritePaths=/tmp /var/lib/holden /var/run/holden /sys/fs/cgroup /run/holden
+
     systemd:
       enabled_services:
         - bluechi-agent
+        - holden-agent
 
 auth:
   # Required for testing the image only:

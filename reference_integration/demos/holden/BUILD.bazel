@@ -10,33 +10,26 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
+# Shared protocol library
+cc_library(
+    name = "protocol",
+    srcs = ["protocol.c"],
+    hdrs = ["protocol.h"],
+    visibility = ["//visibility:private"],
+)
 
-#!/usr/bin/sh
+# Holden agent binary
+cc_binary(
+    name = "holden-agent",
+    srcs = ["agent.c"],
+    visibility = ["//visibility:public"],
+    deps = [":protocol"],
+)
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cd $SCRIPT_DIR
-
-image=true
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --noimage)
-      image=false
-      shift # past argument
-      ;;
-  esac
-done
-
-arch=$(arch)
-
-if [ $image = true ]; then
-  automotive-image-builder --verbose \
-    build \
-    --define-file ../vars-devel.yml \
-    --distro autosd9 \
-    --target qemu \
-    --mode package \
-    --build-dir=_build \
-    --export image \
-    inc_orchestrator.aib.yml \
-    inc_orchestrator.$arch.img
-fi
+# Holden orchestrator binary
+cc_binary(
+    name = "holden-orchestrator",
+    srcs = ["orchestrator.c"],
+    visibility = ["//visibility:public"],
+    deps = [":protocol"],
+)

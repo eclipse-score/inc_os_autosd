@@ -46,3 +46,23 @@ rpm_package(
     summary = "Persistency KVS Demo",
     version = "0.1.0",
 )
+
+rpm_package(
+    name = "holden-orchestrator-demo",
+    binaries = [
+        "//demos/holden:holden-orchestrator",
+    ],
+    description = "pidfd-based process orchestrator for managing and monitoring processes with automatic restart capability",
+    summary = "Holden Process Orchestrator",
+    version = "0.1.0",
+)
+
+rpm_package(
+    name = "holden-agent-demo",
+    binaries = [
+        "//demos/holden:holden-agent",
+    ],
+    description = "Stateless process spawning agent for container-based process management",
+    summary = "Holden Agent Daemon",
+    version = "0.1.0",
+)
