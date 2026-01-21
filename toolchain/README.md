@@ -15,15 +15,15 @@ local_path_override(
 
 bazel_dep(name = "os_autosd", version = "1.0.0")
 
-# Configure AutoSD 9 GCC toolchain
-autosd_9_gcc = use_extension("@os_autosd//toolchain/autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
-autosd_9_gcc.configure(
+# Configure AutoSD 10 GCC toolchain
+autosd_10_gcc = use_extension("@os_autosd//toolchain/autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+autosd_10_gcc.configure(
     c_flags = ["-Wall", "-Wno-error=deprecated-declarations", "-Werror", "-fPIC"],
     cxx_flags = ["-Wall", "-Wno-error=deprecated-declarations", "-Werror", "-fPIC"],
 )
 
-use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
-register_toolchains("@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64")
+use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
+register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
 ```
 
 ### In your .bazelrc
@@ -37,7 +37,6 @@ build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 
 ## Available Toolchains
 
-- **AutoSD 9 GCC**: `@os_autosd//toolchain/autosd_9_gcc`
 - **AutoSD 10 GCC**: `@os_autosd//toolchain/autosd_10_gcc`
 
 ## Configuration Options

@@ -291,26 +291,6 @@ if [[ "$DISTRO" == autosd* ]]; then
         ln -s ld.bfd usr/bin/ld
         echo "Created ld -> ld.bfd symlink" >&2
     fi
-
-    # Only apply linker script fixes for AutoSD 9
-    if [[ "$DISTRO" == "autosd9" ]]; then
-        echo "Applying AutoSD 9 linker script fixes..." >&2
-        find usr/lib64 usr/lib -name '*.so' -type f 2>/dev/null | while read -r f; do
-            if head -c 1024 "$f" 2>/dev/null | grep -q "GNU ld script"; then
-                echo "Fixing linker script: $f" >&2
-                sed -i \
-                    -e 's|/usr/lib64/|=/usr/lib64/|g' \
-                    -e 's|/usr/lib/|=/usr/lib/|g' \
-                    -e 's| /lib64/| =/lib64/|g' \
-                    -e 's|^/lib64/|=/lib64/|g' \
-                    -e 's|(/lib64/|(=/lib64/|g' \
-                    -e 's| /lib/| =/lib/|g' \
-                    -e 's|^/lib/|=/lib/|g' \
-                    -e 's|(/lib/|(=/lib/|g' \
-                    "$f"
-            fi
-        done
-    fi
 fi
 
 echo "Toolchain setup complete!" >&2

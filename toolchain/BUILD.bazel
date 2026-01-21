@@ -17,35 +17,10 @@ constraint_setting(
     name = "glibc_version",
 )
 
-# Glibc 2.34+ constraint for AutoSD 9 compatibility
-constraint_value(
-    name = "glibc_2_34_plus",
-    constraint_setting = ":glibc_version",
-)
-
 # Glibc 2.39+ constraint for AutoSD 10/CentOS compatibility
 constraint_value(
     name = "glibc_2_39_plus",
     constraint_setting = ":glibc_version",
-)
-
-# Platform definition for AutoSD 9 requiring glibc 2.34+
-platform(
-    name = "autosd9_x86_64",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-        ":glibc_2_34_plus",
-    ],
-)
-
-platform(
-    name = "autosd9_aarch64",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:aarch64",
-        ":glibc_2_34_plus",
-    ],
 )
 
 # Platform definition for AutoSD 10/CentOS requiring glibc 2.39+
