@@ -234,7 +234,7 @@ echo "Setting up toolchain library directory..." >&2
 mkdir -p usr/lib64/toolchain
 
 shopt -s nullglob
-for lib_pattern in "libbfd*.so*" "libopcodes*.so*" "libctf*.so*" "libmpc.so*" "libgmp.so*" "libmpfr.so*"; do
+for lib_pattern in "libbfd*.so*" "libopcodes*.so*" "libctf*.so*" "libsframe*.so*" "libmpc.so*" "libgmp.so*" "libmpfr.so*"; do
     for lib in usr/lib64/${lib_pattern}; do
         if [ -f "$lib" ]; then
             ln -sf "../$(basename "$lib")" usr/lib64/toolchain/
