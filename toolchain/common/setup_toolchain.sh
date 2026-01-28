@@ -15,8 +15,23 @@ set -euo pipefail
 
 REPO_URL="$1"
 ARCH="$2"
-shift 2
-PACKAGES=("$@")
+
+# AutoSD 10 packages to download (versions discovered dynamically)
+PACKAGES=(
+    "gcc"
+    "gcc-c++"
+    "cpp"
+    "binutils"
+    "glibc-devel"
+    "libstdc++-devel"
+    "libstdc++"
+    "kernel-headers"
+    "glibc"
+    "libgcc"
+    "libmpc"
+    "gmp"
+    "mpfr"
+)
 
 USER_AGENT="Multi-GCC-Toolchain/1.0"
 MAX_RETRIES=3
