@@ -55,7 +55,7 @@ def _autosd_10_gcc_toolchain_impl(repository_ctx):
     )
 
     # Run setup script with unbuffered output
-    setup_args = ["bash", "-c", "exec ./setup_toolchain.sh 'autosd10' '{}' '{}' {}".format(
+    setup_args = ["bash", "-c", "exec ./setup_toolchain.sh '{}' '{}' {}".format(
         "{}/os".format(repo_url),
         rpm_arch,
         " ".join(["'{}'".format(p) for p in _PACKAGES]),

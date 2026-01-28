@@ -13,10 +13,9 @@
 #!/bin/bash
 set -euo pipefail
 
-DISTRO="$1"
-REPO_URL="$2"
-ARCH="$3"
-shift 3
+REPO_URL="$1"
+ARCH="$2"
+shift 2
 PACKAGES=("$@")
 
 USER_AGENT="Multi-GCC-Toolchain/1.0"
@@ -52,58 +51,25 @@ download_package() {
 
     local rpm_url
     local rpm_file
+    local encoded_pkg_name="${pkg_name//+/%2B}"
 
-    if [[ "$DISTRO" == "fedora" ]]; then
-        local encoded_pkg_name="${pkg_name//+/%2B}"
+    # Find package URL in AutoSD repository listing
+    rpm_url=$(grep -o "href=\"[^\"]*/${encoded_pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
+        sed 's/href="//;s/"$//' | sort -V | tail -1)
 
-        # Try URL-encoded version first (for gcc-c++)
-        rpm_file=$(grep -o "href=\"${encoded_pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
+    if [ -z "$rpm_url" ]; then
+        rpm_url=$(grep -o "href=\"[^\"]*/${pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
             sed 's/href="//;s/"$//' | sort -V | tail -1)
+    fi
 
-        # Try non-encoded version (for libstdc++)
-        if [ -z "$rpm_file" ]; then
-            rpm_file=$(grep -o "href=\"${pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
-                sed 's/href="//;s/"$//' | sort -V | tail -1)
-        fi
-
-        # Try case-insensitive as last resort
-        if [ -z "$rpm_file" ]; then
-            rpm_file=$(grep -i "href=\".*${pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
-                grep -o "href=\"[^\"]*\"" | sed 's/href="//;s/"$//' | \
-                grep "${pkg_name}-[0-9].*\\.${ARCH}\\.rpm" | sort -V | tail -1)
-        fi
-
-        if [ -z "$rpm_file" ]; then
-            echo "[$pkg_name] ERROR: Package not found" >&2
-            grep -i "${pkg_name}" "$html_page" | head -5 | sed "s/^/[$pkg_name]   /" >&2
-            return 1
-        fi
-
-        rpm_file="${rpm_file//%2B/+}"
-        rpm_url="${REPO_URL}/Packages/${rpm_file}"
-    elif [[ "$DISTRO" == autosd* ]]; then
-        local encoded_pkg_name="${pkg_name//+/%2B}"
-
-        rpm_url=$(grep -o "href=\"[^\"]*/${encoded_pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
-            sed 's/href="//;s/"$//' | sort -V | tail -1)
-
-        if [ -z "$rpm_url" ]; then
-            rpm_url=$(grep -o "href=\"[^\"]*/${pkg_name}-[0-9][^\"]*\\.${ARCH}\\.rpm\"" "$html_page" | \
-                sed 's/href="//;s/"$//' | sort -V | tail -1)
-        fi
-
-        if [ -z "$rpm_url" ]; then
-            echo "[$pkg_name] ERROR: Package not found" >&2
-            grep -i "${pkg_name}" "$html_page" | head -5 | sed "s/^/[$pkg_name]   /" >&2
-            return 1
-        fi
-
-        rpm_file=$(basename "$rpm_url")
-        rpm_file="${rpm_file//%2B/+}"
-    else
-        echo "[$pkg_name] ERROR: Unknown distro: $DISTRO" >&2
+    if [ -z "$rpm_url" ]; then
+        echo "[$pkg_name] ERROR: Package not found" >&2
+        grep -i "${pkg_name}" "$html_page" | head -5 | sed "s/^/[$pkg_name]   /" >&2
         return 1
     fi
+
+    rpm_file=$(basename "$rpm_url")
+    rpm_file="${rpm_file//%2B/+}"
 
     echo "[$pkg_name] Downloading: $rpm_file" >&2
 
@@ -171,13 +137,7 @@ download_package() {
 }
 
 # Fetch package listing once
-packages_dir="${REPO_URL}/Packages"
-search_url="${packages_dir}/"
-
-# Check if subdirectory structure exists (Fedora uses first letter subdirs)
-if curl -L -s -f -I -A "$USER_AGENT" "${packages_dir}/g/" >/dev/null 2>&1; then
-    echo "Note: Repository uses subdirectory structure" >&2
-fi
+search_url="${REPO_URL}/"
 
 echo "Fetching package list from: ${search_url}" >&2
 html_page=$(mktemp)
@@ -284,13 +244,10 @@ WRAPPER_EOF
     mv "${tool_path}_wrapper" "$tool_path"
 done
 
-if [[ "$DISTRO" == autosd* ]]; then
-    echo "Applying AutoSD-specific fixes..." >&2
-
-    if [ -f usr/bin/ld.bfd ] && [ ! -e usr/bin/ld ]; then
-        ln -s ld.bfd usr/bin/ld
-        echo "Created ld -> ld.bfd symlink" >&2
-    fi
+echo "Applying linker fixes..." >&2
+if [ -f usr/bin/ld.bfd ] && [ ! -e usr/bin/ld ]; then
+    ln -s ld.bfd usr/bin/ld
+    echo "Created ld -> ld.bfd symlink" >&2
 fi
 
 echo "Toolchain setup complete!" >&2
