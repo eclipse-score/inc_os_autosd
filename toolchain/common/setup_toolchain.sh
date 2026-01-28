@@ -13,8 +13,11 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO_URL="$1"
-ARCH="$2"
+ARCH="$1"
+
+# AutoSD 10 repository URL
+REPO_BASE_URL="https://autosd.sig.centos.org/AutoSD-10/nightly/repos/AutoSD/compose/AutoSD"
+REPO_URL="${REPO_BASE_URL}/${ARCH}/os"
 
 # AutoSD 10 packages to download (versions discovered dynamically)
 PACKAGES=(
@@ -37,8 +40,9 @@ USER_AGENT="Multi-GCC-Toolchain/1.0"
 MAX_RETRIES=3
 MAX_VERSION_INCREMENTS=1  # Try up to 1 patch version increments
 
-echo "Setting up toolchain from: $REPO_URL" >&2
+echo "Setting up AutoSD 10 GCC toolchain" >&2
 echo "Architecture: $ARCH" >&2
+echo "Repository: $REPO_URL" >&2
 echo "Packages: ${PACKAGES[*]}" >&2
 
 # Increment the patch version in an RPM filename
@@ -152,7 +156,7 @@ download_package() {
 }
 
 # Fetch package listing once
-search_url="${REPO_URL}/"
+search_url="${REPO_URL}/Packages/"
 
 echo "Fetching package list from: ${search_url}" >&2
 html_page=$(mktemp)
