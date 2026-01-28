@@ -11,27 +11,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
 
-def validate_system_requirements(repository_ctx):
-    """Validate that required system tools are available.
-
-    Args:
-        repository_ctx: The repository context provided by Bazel
-    """
-
-    # Early validation of required system tools
-    for tool in ["rpm2cpio", "cpio", "bash", "grep", "sed", "find", "curl"]:
-        result = repository_ctx.execute(["which", tool])
-        if result.return_code != 0:
-            fail("Required tool '{}' is not available in PATH. Please install it before using this toolchain.".format(tool))
-
-    # Validate rpm2cpio specifically work
-    rpm2cpio_test = repository_ctx.execute(["rpm2cpio", "--help"])
-    if rpm2cpio_test.return_code != 0:
-        # Some versions don't support --help, try with no args (should show usage and exit with code 1)
-        rpm2cpio_test2 = repository_ctx.execute(["rpm2cpio"])
-        if rpm2cpio_test2.return_code not in [0, 1, 2]:
-            fail("rpm2cpio tool is not working properly. Please ensure rpm2cpio is installed and functional.")
-
 def get_target_architecture(repository_ctx):
     """Get the target architecture, mapping Bazel arch names to RPM arch names.
 

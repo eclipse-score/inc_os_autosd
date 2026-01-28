@@ -14,13 +14,10 @@ load(
     "//common:toolchain_utils.bzl",
     "detect_gcc_version",
     "get_target_architecture",
-    "validate_system_requirements",
 )
 
 def _autosd_10_gcc_toolchain_impl(repository_ctx):
     """Downloads AutoSD 10 RPM packages and creates an isolated GCC toolchain."""
-    validate_system_requirements(repository_ctx)
-
     rpm_arch = get_target_architecture(repository_ctx)
 
     print("Setting up AutoSD 10 GCC toolchain for {}".format(rpm_arch))

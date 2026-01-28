@@ -13,6 +13,37 @@
 #!/bin/bash
 set -euo pipefail
 
+# Validate system requirements
+validate_system_requirements() {
+    local missing_tools=()
+
+    for tool in rpm2cpio cpio bash grep sed find curl; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            missing_tools+=("$tool")
+        fi
+    done
+
+    if [ ${#missing_tools[@]} -gt 0 ]; then
+        echo "ERROR: Required tools are not available: ${missing_tools[*]}" >&2
+        exit 1
+    fi
+
+    # Validate rpm2cpio works (accepts exit codes 0, 1, or 2)
+    if ! rpm2cpio --help >/dev/null 2>&1; then
+        set +e
+        rpm2cpio >/dev/null 2>&1
+        local exit_code=$?
+        set -e
+        if [ $exit_code -ne 0 ] && [ $exit_code -ne 1 ] && [ $exit_code -ne 2 ]; then
+            echo "ERROR: rpm2cpio is not working properly" >&2
+            exit 1
+        fi
+    fi
+}
+
+# Validate system before proceeding
+validate_system_requirements
+
 ARCH="$1"
 
 # AutoSD 10 repository URL
