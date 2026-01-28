@@ -13,6 +13,38 @@
 #!/bin/bash
 set -euo pipefail
 
+# Parse arguments
+TARBALL_MODE=false
+TARBALL_OUTPUT=""
+
+if [ "${1:-}" = "--tarball" ]; then
+    TARBALL_MODE=true
+    if [ $# -lt 3 ]; then
+        echo "ERROR: --tarball requires output path and architecture" >&2
+        echo "Usage: $0 --tarball OUTPUT_PATH ARCH" >&2
+        echo "       $0 ARCH" >&2
+        exit 1
+    fi
+    TARBALL_OUTPUT="$2"
+    shift 2
+elif [ $# -lt 1 ]; then
+    echo "ERROR: Missing architecture argument" >&2
+    echo "Usage: $0 --tarball OUTPUT_PATH ARCH" >&2
+    echo "       $0 ARCH" >&2
+    exit 1
+fi
+
+ARCH="$1"
+
+# Setup working directory
+WORK_DIR="$(pwd)"
+if [ "$TARBALL_MODE" = "true" ]; then
+    TEMP_DIR=$(mktemp -d -t autosd-toolchain-XXXXXX)
+    echo "Working in temporary directory: $TEMP_DIR" >&2
+    cd "$TEMP_DIR"
+    trap 'cd "$WORK_DIR"; rm -rf "$TEMP_DIR"' EXIT
+fi
+
 # Validate system requirements
 validate_system_requirements() {
     local missing_tools=()
@@ -43,8 +75,6 @@ validate_system_requirements() {
 
 # Validate system before proceeding
 validate_system_requirements
-
-ARCH="$1"
 
 # AutoSD 10 repository URL
 REPO_BASE_URL="https://autosd.sig.centos.org/AutoSD-10/nightly/repos/AutoSD/compose/AutoSD"
@@ -298,6 +328,30 @@ echo "Applying linker fixes..." >&2
 if [ -f usr/bin/ld.bfd ] && [ ! -e usr/bin/ld ]; then
     ln -s ld.bfd usr/bin/ld
     echo "Created ld -> ld.bfd symlink" >&2
+fi
+
+# Create tarball if requested
+if [ "$TARBALL_MODE" = "true" ]; then
+    # Resolve absolute path for output (since we're in temp dir)
+    OUTPUT_PATH="$WORK_DIR/$TARBALL_OUTPUT"
+    echo "Creating tarball: $OUTPUT_PATH" >&2
+
+    # Create metadata file
+    cat > SYSROOT_INFO <<EOF
+# AutoSD 10 GCC Toolchain Sysroot
+ARCH=$ARCH
+CREATED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+REPO_URL=$REPO_URL
+PACKAGES=${PACKAGES[*]}
+EOF
+
+    # Create tarball with sysroot contents
+    tar -czf "$OUTPUT_PATH" \
+        --transform 's,^\.,sysroot,' \
+        ./usr ./lib64 ./SYSROOT_INFO
+
+    echo "Tarball created successfully: $OUTPUT_PATH" >&2
+    echo "Contents: usr/, lib64/, SYSROOT_INFO" >&2
 fi
 
 echo "Toolchain setup complete!" >&2
