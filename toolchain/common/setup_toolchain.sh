@@ -284,24 +284,28 @@ done
 shopt -u nullglob
 
 echo "Creating sysroot structure..." >&2
-if [ -d usr/lib64 ]; then
-    mkdir -p lib64
-    find usr/lib64 -type f | while read -r f; do
-        filename=$(basename "$f")
-        if [ ! -e "lib64/$filename" ]; then
-            ln -s "../$f" "lib64/$filename"
-        fi
-    done
-fi
+# Note: lib64 and lib symlink directories are not created for tarball mode
+# to avoid issues with strip_prefix breaking symlinks in http_archive
+if [ "$TARBALL_MODE" = "false" ]; then
+    if [ -d usr/lib64 ]; then
+        mkdir -p lib64
+        find usr/lib64 -type f | while read -r f; do
+            filename=$(basename "$f")
+            if [ ! -e "lib64/$filename" ]; then
+                ln -s "../$f" "lib64/$filename"
+            fi
+        done
+    fi
 
-if [ -d usr/lib ]; then
-    mkdir -p lib
-    find usr/lib -type f | while read -r f; do
-        filename=$(basename "$f")
-        if [ ! -e "lib/$filename" ]; then
-            ln -s "../$f" "lib/$filename"
-        fi
-    done
+    if [ -d usr/lib ]; then
+        mkdir -p lib
+        find usr/lib -type f | while read -r f; do
+            filename=$(basename "$f")
+            if [ ! -e "lib/$filename" ]; then
+                ln -s "../$f" "lib/$filename"
+            fi
+        done
+    fi
 fi
 
 echo "Creating binary wrappers..." >&2
@@ -345,13 +349,15 @@ REPO_URL=$REPO_URL
 PACKAGES=${PACKAGES[*]}
 EOF
 
+    # Create sysroot directory and move contents to avoid transform symlink issues
+    mkdir -p sysroot
+    mv usr SYSROOT_INFO sysroot/
+
     # Create tarball with sysroot contents
-    tar -czf "$OUTPUT_PATH" \
-        --transform 's,^\.,sysroot,' \
-        ./usr ./lib64 ./SYSROOT_INFO
+    tar -czf "$OUTPUT_PATH" sysroot
 
     echo "Tarball created successfully: $OUTPUT_PATH" >&2
-    echo "Contents: usr/, lib64/, SYSROOT_INFO" >&2
+    echo "Contents: usr/, SYSROOT_INFO" >&2
 fi
 
 echo "Toolchain setup complete!" >&2
