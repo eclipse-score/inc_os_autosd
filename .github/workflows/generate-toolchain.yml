@@ -1,0 +1,50 @@
+# *******************************************************************************
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+
+name: Generate Toolchain Tarball
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-toolchain-tarball:
+    name: Generate Toolchain Tarball
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y rpm2cpio cpio curl
+
+      - name: Generate toolchain tarball
+        run: |
+          ./setup_toolchain.sh --tarball "autosd-toolchain-${{ matrix.arch }}.tar.gz" ${{ matrix.arch }}
+        working-directory: toolchain/common
+
+      - name: Upload to continuous release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: continuous
+          name: Continuous Build
+          prerelease: true
+          files: toolchain/common/autosd-toolchain-${{ matrix.arch }}.tar.gz
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
