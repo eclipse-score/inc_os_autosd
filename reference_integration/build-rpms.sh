@@ -38,9 +38,24 @@ RPMS_DIR="${RPMS_DIR:-$REPO_ROOT/os_images/rpms}"
 
 echo "Output directory: $RPMS_DIR"
 
+# Debug: Check if extra_link_flags are in the toolchain config
+echo "=== DEBUG: Checking toolchain config for extra_link_flags ==="
+bazel info output_base
+cat $(bazel info output_base)/external/score_bazel_cpp_toolchains++gcc+score_autosd_10_toolchain/cc_toolchain_config.bzl | grep -A5 "extra_link_flags" || echo "No extra_link_flags found in config"
+
 # Build all RPM packages
 echo "Building lola-demo..."
-bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:lola-demo
+bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:lola-demo || true
+
+# Debug: Check the linker params file
+echo "=== DEBUG: Full linker params file content ==="
+PARAMS_FILE=$(find $(bazel info output_base)/../../../bazel-out -name "*ipc_bridge_cpp-0.params" 2>/dev/null | head -1)
+if [ -n "$PARAMS_FILE" ]; then
+    echo "Params file: $PARAMS_FILE"
+    cat "$PARAMS_FILE"
+else
+    echo "No params file found"
+fi
 
 echo "Building persistency-demo..."
 bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:persistency-demo
