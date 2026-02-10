@@ -39,6 +39,12 @@ jobs:
           ./setup_toolchain.sh --tarball "autosd-toolchain-aarch64.tar.gz" aarch64
         working-directory: toolchain/common
 
+      - name: Delete existing continuous release (if any)
+        run: |
+          gh release delete continuous --yes || true
+          git tag -d continuous || true
+          git push origin :refs/tags/continuous || true
+
       - name: Upload to continuous release
         uses: softprops/action-gh-release@v2
         with:
