@@ -38,10 +38,19 @@ RPMS_DIR="${RPMS_DIR:-$REPO_ROOT/os_images/rpms}"
 
 echo "Output directory: $RPMS_DIR"
 
-# Debug: Check if extra_link_flags are in the toolchain config
+# Debug: Force fetch of toolchain and check config
+echo "=== DEBUG: Fetching toolchain repository ==="
+bazel fetch @score_autosd_10_toolchain//... 2>&1 || true
 echo "=== DEBUG: Checking toolchain config for extra_link_flags ==="
-bazel info output_base
-cat $(bazel info output_base)/external/score_bazel_cpp_toolchains++gcc+score_autosd_10_toolchain/cc_toolchain_config.bzl | grep -A5 "extra_link_flags" || echo "No extra_link_flags found in config"
+OUTPUT_BASE=$(bazel info output_base)
+echo "Output base: $OUTPUT_BASE"
+TOOLCHAIN_DIR="$OUTPUT_BASE/external/score_bazel_cpp_toolchains++gcc+score_autosd_10_toolchain"
+if [ -f "$TOOLCHAIN_DIR/cc_toolchain_config.bzl" ]; then
+    echo "Found toolchain config, checking for extra_link_flags:"
+    cat "$TOOLCHAIN_DIR/cc_toolchain_config.bzl" | grep -A5 "extra_link_flags"
+else
+    echo "Toolchain config not found at $TOOLCHAIN_DIR"
+fi
 
 # Build all RPM packages
 echo "Building lola-demo..."
@@ -49,12 +58,16 @@ bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux
 
 # Debug: Check the linker params file
 echo "=== DEBUG: Full linker params file content ==="
-PARAMS_FILE=$(find $(bazel info output_base)/../../../bazel-out -name "*ipc_bridge_cpp-0.params" 2>/dev/null | head -1)
+PARAMS_FILE=$(find bazel-out -name "*ipc_bridge_cpp-0.params" 2>/dev/null | head -1)
 if [ -n "$PARAMS_FILE" ]; then
     echo "Params file: $PARAMS_FILE"
     cat "$PARAMS_FILE"
 else
-    echo "No params file found"
+    echo "No params file found in bazel-out/, searching in output_base:"
+    find "$OUTPUT_BASE" -name "*ipc_bridge_cpp-0.params" 2>/dev/null | head -3 | while read f; do
+        echo "Found: $f"
+        cat "$f"
+    done
 fi
 
 echo "Building persistency-demo..."
