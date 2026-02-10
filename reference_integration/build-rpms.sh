@@ -18,24 +18,35 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Allow override of build config
-BUILD_CONFIG="${BUILD_CONFIG:-bl-x86_64-linux-autosd}"
+# Allow override of build config (optional)
+CONFIG_FLAG=""
+if [ -n "${BUILD_CONFIG:-}" ]; then
+    CONFIG_FLAG="--config=$BUILD_CONFIG"
+    echo "Build config: $BUILD_CONFIG"
+fi
+
+# Allow override of platform (optional)
+# If PLATFORM is set, it will be used with --platforms flag
+PLATFORM_FLAG=""
+if [ -n "${PLATFORM:-}" ]; then
+    PLATFORM_FLAG="--platforms=$PLATFORM"
+    echo "Platform override: $PLATFORM"
+fi
 
 # Output directory for RPMs
 RPMS_DIR="${RPMS_DIR:-$REPO_ROOT/os_images/rpms}"
 
-echo "Building RPMs with config: $BUILD_CONFIG"
 echo "Output directory: $RPMS_DIR"
 
 # Build all RPM packages
 echo "Building lola-demo..."
-bazel build --config="$BUILD_CONFIG" //:lola-demo
+bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:lola-demo
 
 echo "Building persistency-demo..."
-bazel build --config="$BUILD_CONFIG" //:persistency-demo
+bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:persistency-demo
 
 echo "Building holden packages..."
-bazel build --config="$BUILD_CONFIG" //:holden-orchestrator-demo //:holden-agent-demo
+bazel build --verbose_failures --platforms=@score_bazel_platforms//:x86_64-linux-gcc_autosd-10.0-autosd //:holden-orchestrator-demo //:holden-agent-demo
 
 # Create output directory
 mkdir -p "$RPMS_DIR"

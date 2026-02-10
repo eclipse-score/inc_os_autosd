@@ -23,9 +23,29 @@ local_path_override(
     path = "../rpm"
 )
 
-autosd_10_gcc = use_extension("@os_autosd_toolchain//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
-use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
-register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
+# Use score_bazel_cpp_toolchains from git
+bazel_dep(name = "score_bazel_cpp_toolchains", version = "0.0.1")
+git_override(
+    module_name = "score_bazel_cpp_toolchains",
+    remote = "https://github.com/bilelmoussaoui/bazel_cpp_toolchains.git",
+    branch = "bilelmoussaoui/autosd-10",
+)
+
+# Setup GCC toolchains using the generic framework
+gcc = use_extension("@score_bazel_cpp_toolchains//extensions:gcc.bzl", "gcc")
+
+# Setting AutoSD 10 GCC (CPU:x86_64|OS:Linux|V:autosd-10.0|ES:autosd)
+gcc.toolchain(
+    name = "score_autosd_10_toolchain",
+    target_cpu = "x86_64",
+    target_os = "linux",
+    runtime_ecosystem = "autosd",
+    version = "autosd-10.0",
+    use_default_package = True,
+)
+
+use_repo(gcc, "score_autosd_10_toolchain")
+register_toolchains("@score_autosd_10_toolchain//:x86_64-linux-gcc_autosd-10.0-autosd")
 
 # Register the RPM toolchain (using local toolchain from parent)
 rpm_toolchain_ext = use_extension("@rules_rpm//toolchain:extensions.bzl", "rpm_toolchain")

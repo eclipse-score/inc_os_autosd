@@ -57,9 +57,10 @@ single_version_override(
 )
 
 bazel_dep(name = "score_bazel_platforms")
-single_version_override(
+git_override(
     module_name = "score_bazel_platforms",
-    version = "0.0.2",
+    remote = "https://github.com/eclipse-score/bazel_platforms.git",
+    branch = "main",
 )
 
 bazel_dep(name = "score_test_scenarios")
