@@ -20,9 +20,6 @@ jobs:
   generate-toolchain-tarball:
     name: Generate Toolchain Tarball
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [x86_64, aarch64]
     permissions:
       contents: write # Push tag
       id-token: write
@@ -38,7 +35,8 @@ jobs:
 
       - name: Generate toolchain tarball
         run: |
-          ./setup_toolchain.sh --tarball "autosd-toolchain-${{ matrix.arch }}.tar.gz" ${{ matrix.arch }}
+          ./setup_toolchain.sh --tarball "autosd-toolchain-x86_64.tar.gz" x86_64
+          ./setup_toolchain.sh --tarball "autosd-toolchain-aarch64.tar.gz" aarch64
         working-directory: toolchain/common
 
       - name: Upload to continuous release
@@ -47,7 +45,9 @@ jobs:
           tag_name: continuous
           name: Continuous Build
           prerelease: true
-          files: toolchain/common/autosd-toolchain-${{ matrix.arch }}.tar.gz
+          files: |
+            toolchain/common/autosd-toolchain-x86_64.tar.gz
+            toolchain/common/autosd-toolchain-aarch64.tar.gz
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
