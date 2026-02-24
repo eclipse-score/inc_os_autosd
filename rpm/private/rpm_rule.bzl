@@ -193,34 +193,62 @@ def _collect_cc_headers(ctx):
 def _generate_files_list(ctx):
     """Generate %files section for spec file."""
     files = []
+    directories = {}
+
+    # Standard system directories that don't need %dir entries
+    standard_dirs = ["/usr", "/usr/bin", "/usr/lib", "/usr/lib64", "/usr/include", "/usr/share", "/etc"]
+
+    def _track_directory(file_path):
+        """Extract and track parent directory from a file path."""
+
+        # Handle paths with %attr() or %config() prefixes
+        actual_path = file_path.split(" ")[-1]
+        dir_path = actual_path.rsplit("/", 1)[0]
+
+        # Track directory if it's not a standard system directory
+        if dir_path and dir_path not in standard_dirs and dir_path not in directories:
+            directories[dir_path] = True
 
     # Add binaries with executable permissions
     for binary in ctx.files.binaries:
-        files.append("%attr(755,-,-) {}/{}".format(ctx.attr.binary_dir, binary.basename))
+        file_entry = "%attr(755,-,-) {}/{}".format(ctx.attr.binary_dir, binary.basename)
+        files.append(file_entry)
+        _track_directory(file_entry)
 
     # Add libraries with appropriate permissions
     for library in ctx.files.libraries:
         if library.basename.endswith(".so"):
             # Shared libraries need executable permissions
-            files.append("%attr(755,-,-) {}/{}".format(ctx.attr.library_dir, library.basename))
+            file_entry = "%attr(755,-,-) {}/{}".format(ctx.attr.library_dir, library.basename)
         else:
             # Static libraries keep default permissions
-            files.append("{}/{}".format(ctx.attr.library_dir, library.basename))
+            file_entry = "{}/{}".format(ctx.attr.library_dir, library.basename)
+        files.append(file_entry)
+        _track_directory(file_entry)
 
     # Add all headers (keep default permissions)
     all_headers = _collect_cc_headers(ctx)
     for header in all_headers:
-        files.append("{}/{}".format(ctx.attr.header_dir, header.basename))
+        file_entry = "{}/{}".format(ctx.attr.header_dir, header.basename)
+        files.append(file_entry)
+        _track_directory(file_entry)
 
     # Add configs (mark as configuration files with noreplace)
     for config in ctx.files.configs:
-        files.append("%config(noreplace) {}/{}".format(ctx.attr.config_dir, config.basename))
+        file_entry = "%config(noreplace) {}/{}".format(ctx.attr.config_dir, config.basename)
+        files.append(file_entry)
+        _track_directory(file_entry)
 
     # Add data files (keep default permissions)
     for data_file in ctx.files.data:
-        files.append("{}/{}".format(ctx.attr.data_dir, data_file.basename))
+        file_entry = "{}/{}".format(ctx.attr.data_dir, data_file.basename)
+        files.append(file_entry)
+        _track_directory(file_entry)
 
-    return "\n".join(files)
+    # Prepend directory entries (sorted for consistency)
+    dir_entries = ["%dir {}".format(d) for d in sorted(directories.keys())]
+
+    return "\n".join(dir_entries + files)
 
 def _generate_file_copy_scripts(ctx):
     """Generate a single consolidated script that handles all file copying."""
