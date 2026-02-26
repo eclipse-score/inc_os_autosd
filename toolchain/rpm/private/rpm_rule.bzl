@@ -99,6 +99,7 @@ AutoProv: no
 rm -rf %{{buildroot}}
 mkdir -p %{{buildroot}}
 cp -aL * %{{buildroot}}/
+{post_install_cmds}
 
 %files
 %defattr(644,-,-,755)
@@ -122,6 +123,7 @@ cp -aL * %{{buildroot}}/
         requires = requires_section,
         description = ctx.attr.description or "Package built with Bazel rules_rpm",
         files_list = _generate_files_list(ctx),
+        post_install_cmds = '\n'.join(ctx.attr.post_install)
     )
 
     # Write template to temporary file
@@ -452,6 +454,10 @@ rpm_package = rule(
         "url": attr.string(
             default = "",
             doc = "Project homepage URL (optional)",
+        ),
+        "post_install": attr.string_list(
+          default = [],
+          doc = "List of commands to run after installation"
         ),
         "_stage_files_template": attr.label(
             default = "//private/templates:stage_files.sh.tpl",
