@@ -37,6 +37,9 @@ bazel build --config="$BUILD_CONFIG" //:persistency-demo
 echo "Building holden packages..."
 bazel build --config="$BUILD_CONFIG" //:holden-orchestrator-demo //:holden-agent-demo
 
+echo "Building orchestrator-demo..."
+bazel build --config="$BUILD_CONFIG" //:orchestrator-demo
+
 # Create output directory
 mkdir -p "$RPMS_DIR"
 

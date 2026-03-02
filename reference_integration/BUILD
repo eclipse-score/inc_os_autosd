@@ -66,3 +66,22 @@ rpm_package(
     summary = "Holden Agent Daemon",
     version = "0.1.0",
 )
+
+rpm_package(
+    name = "orchestrator-demo",
+    binaries = [
+        "@score_orchestrator//src/orchestration:basic",
+        "@score_orchestrator//src/orchestration:main_macro_basic",
+        "@score_orchestrator//src/orchestration:catch_error",
+        "@score_orchestrator//src/orchestration:branching",
+        "@score_orchestrator//src/orchestration:dag",
+        "@score_orchestrator//src/orchestration:shutdown",
+        "@score_orchestrator//src/orchestration:shutdown_using_signals",
+        "@score_orchestrator//src/orchestration:events_across_local_programs",
+        "@score_orchestrator//src/orchestration:inter_process_event_sender",
+        "@score_orchestrator//src/orchestration:inter_process_event_receiver",
+    ],
+    description = "Orchestration framework",
+    summary = "Orchestration Demo",
+    version = "1.0.0",
+)

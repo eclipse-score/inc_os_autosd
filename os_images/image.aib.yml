@@ -42,6 +42,7 @@ content:
     - lola-demo
     - persistency-demo
     - holden-orchestrator-demo
+    - orchestrator-demo
 
   make_dirs:
     - path: /etc/containers/systemd/qm.container.d
@@ -115,6 +116,7 @@ qm:
       - lola-demo
       - persistency-demo
       - holden-agent-demo
+      - orchestrator-demo
 
     # Create systemd override directory for holden-agent
     make_dirs:

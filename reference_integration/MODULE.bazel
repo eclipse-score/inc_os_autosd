@@ -58,6 +58,12 @@ git_override(
 )
 
 # imports for the feature showcase module
-bazel_dep(name = "rules_rust", version = "0.61.0")
+bazel_dep(name = "rules_rust", version = "0.67.0")
+git_override(
+    module_name = "rules_rust",
+    commit = "2b171a7376e69cb1207eced1f66904ce4ae0c819",
+    remote = "https://github.com/pawelrutkaq/rules_rust.git",
+)
+
 bazel_dep(name = "score_itf", version = "0.1.0")
 bazel_dep(name = "score_crates", version = "0.0.4")
