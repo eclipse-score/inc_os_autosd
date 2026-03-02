@@ -80,6 +80,10 @@ Source0: {source}
 BuildArch: {arch}
 {requires}
 
+# Disable automatic dependency detection for pre-built binaries
+AutoReq: no
+AutoProv: no
+
 # Disable debuginfo package generation since we're packaging pre-built binaries
 %global debug_package %{{nil}}
 
