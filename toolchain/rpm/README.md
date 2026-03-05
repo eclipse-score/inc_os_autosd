@@ -77,5 +77,6 @@ rpm -qpil bazel-bin/hello_world_rpm-1.0.0-1.x86_64.rpm
 | `header_dir` | `string` | `"/usr/include"` | Header install directory |
 | `config_dir` | `string` | `"/etc"` | Config install directory |
 | `data_dir` | `string` | `"/usr/share"` | Data install directory |
+| `post_install` | `string_list` | `[]` | List of commands to run after installation |
 
 See `examples/` for more examples.
