@@ -37,7 +37,7 @@ jobs:
         run: |
           ./setup_toolchain.sh --tarball "autosd-toolchain-x86_64.tar.gz" x86_64
           ./setup_toolchain.sh --tarball "autosd-toolchain-aarch64.tar.gz" aarch64
-        working-directory: toolchain/common
+        working-directory: toolchain
 
       - name: Delete existing continuous release (if any)
         run: |
@@ -52,8 +52,8 @@ jobs:
           name: Continuous Build
           prerelease: true
           files: |
-            toolchain/common/autosd-toolchain-x86_64.tar.gz
-            toolchain/common/autosd-toolchain-aarch64.tar.gz
+            toolchain/autosd-toolchain-x86_64.tar.gz
+            toolchain/autosd-toolchain-aarch64.tar.gz
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -11,7 +11,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
 load(
-    "//common:toolchain_utils.bzl",
+    ":toolchain_utils.bzl",
     "detect_gcc_version",
     "get_target_architecture",
 )
@@ -25,7 +25,7 @@ def _autosd_10_gcc_toolchain_impl(repository_ctx):
     # Copy setup script to repository
     repository_ctx.template(
         "setup_toolchain.sh",
-        Label("//common:setup_toolchain.sh"),
+        Label("//autosd_10_gcc:setup_toolchain.sh"),
         substitutions = {},
         executable = True,
     )
@@ -54,7 +54,7 @@ def _autosd_10_gcc_toolchain_impl(repository_ctx):
 
     repository_ctx.template(
         "BUILD.bazel",
-        Label("//common:BUILD.bazel.template"),
+        Label("//autosd_10_gcc:BUILD.bazel.template"),
         substitutions = {
             "{GCC_VERSION}": gcc_version,
             "{GCC_MAJOR}": gcc_major,
@@ -69,7 +69,7 @@ def _autosd_10_gcc_toolchain_impl(repository_ctx):
     # Copy shared template instead of generating dynamically
     repository_ctx.template(
         "cc_toolchain_config.bzl",
-        Label("//common:cc_toolchain_config.bzl.template"),
+        Label("//autosd_10_gcc:cc_toolchain_config.bzl.template"),
         substitutions = {
             "{REPO_NAME}": repository_ctx.name,
             "{DISTRO_NAME}": "autosd_10",

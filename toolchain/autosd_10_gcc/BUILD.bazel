@@ -15,6 +15,10 @@ package(default_visibility = ["//visibility:public"])
 # Export the extension for use by other modules
 exports_files([
     "extensions.bzl",
+    "toolchain_utils.bzl",
+    "setup_toolchain.sh",
+    "BUILD.bazel.template",
+    "cc_toolchain_config.bzl.template",
 ])
 
 # Convenience alias to the generated toolchain
