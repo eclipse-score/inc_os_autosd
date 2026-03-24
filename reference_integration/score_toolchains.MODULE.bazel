@@ -10,11 +10,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
-bazel_dep(name = "os_autosd_toolchain", version = "0.0.1")
+bazel_dep(name = "os_autosd", version = "0.0.1")
 # override with local path
 local_path_override(
-    module_name = "os_autosd_toolchain",
-    path = "../toolchain",
+    module_name = "os_autosd",
+    path = "..",
 )
 bazel_dep(name = "rules_rpm", version = "0.0.1")
 # override with local path
@@ -23,7 +23,7 @@ local_path_override(
     path = "../toolchain/rpm"
 )
 
-autosd_10_gcc = use_extension("@os_autosd_toolchain//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+autosd_10_gcc = use_extension("@os_autosd//toolchain/autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
 use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
 register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
 
