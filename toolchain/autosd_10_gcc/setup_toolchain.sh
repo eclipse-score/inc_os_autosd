@@ -95,6 +95,7 @@ PACKAGES=(
     "libmpc"
     "gmp"
     "mpfr"
+    "jansson"
 )
 
 USER_AGENT="Multi-GCC-Toolchain/1.0"
