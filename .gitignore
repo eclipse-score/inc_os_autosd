@@ -42,7 +42,7 @@ repodata/
 
 # Bazel
 bazel-*
-MODULE.bazel.lock
+#MODULE.bazel.lock
 user.bazelrc
 
 # Ruff
