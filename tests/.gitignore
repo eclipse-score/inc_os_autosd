@@ -2,6 +2,6 @@ _build/
 outputs/
 bazel-bin/
 bazel-out/
-bazel-reference_integration/
+bazel-tests/
 bazel-testlogs/
 auto-image-builder.sh

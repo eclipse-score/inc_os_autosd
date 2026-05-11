@@ -22,7 +22,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_CONFIG="${BUILD_CONFIG:-bl-x86_64-linux-autosd}"
 
 # Output directory for RPMs
-RPMS_DIR="${RPMS_DIR:-$REPO_ROOT/os_images/rpms}"
+RPMS_DIR="${RPMS_DIR:-$REPO_ROOT/rpms}"
 
 echo "Building RPMs with config: $BUILD_CONFIG"
 echo "Output directory: $RPMS_DIR"
