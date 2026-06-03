@@ -8,7 +8,7 @@ This repository contains files to on-board AutoSD as a development target platfo
 | ----------------------------------- | ------------------------------------------------------- |
 | `README.md`                         | Repository short description and instructions           |
 | `toolchain/`                        | Bazel toolchain to build modules using AutoSD's tooling |
-| `reference_integration/`            | Tooling to run AutoSD in different targets, such a QEMU |
+| `tests/`                            | Build files for testing the toolchain on top of S-Core  |
 | `docs/`                             | Documentation                                           |
 | `.github/workflows/`                | CI/CD pipelines                                         |
 | `.vscode/`                          | Recommended VS Code settings                            |
@@ -82,14 +82,6 @@ rm -rf _build
 ### Toolchain
 
 Intructions to use files from the [toolchain](./toolchain) folder.
-
-### Reference Integration
-
-Intructions to use files from the [reference_integration](./reference_integration) folder.
-
-### OS Images
-
-Intructions to use files from the [os_images](./os_images) folder.
 
 ## License
 

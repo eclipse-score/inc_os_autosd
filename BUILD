@@ -26,7 +26,7 @@ copyright_checker(
     name = "copyright",
     srcs = [
         "Containerfile",
-        "reference_integration",
+        "tests",
         "toolchain",
         "//:BUILD",
         "//:MODULE.bazel",

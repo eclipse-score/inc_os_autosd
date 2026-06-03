@@ -11,7 +11,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
 module(
-    name = "os_autosd_reference_integration",
+    name = "os_autosd_tests",
     version = "0.0.1",
 )
 

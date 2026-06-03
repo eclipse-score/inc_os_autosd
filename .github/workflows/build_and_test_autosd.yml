@@ -18,8 +18,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  lola-demo:
-    name: lola-demo
+  build:
+    name: build
     runs-on: ubuntu-latest
     env:
       USE_BAZEL_VERSION: 8.3.0
@@ -36,48 +36,8 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y podman curl qemu-system which createrepo-c pip make git
-          # remove the follwing line once qemu driver changes are released
-          pip install uv
+          sudo apt-get install -y podman curl which createrepo-c pip make git
 
-      - name: Build and copy RPMs
+      - name: Build RPMs
         run: ./build-rpms.sh
-        working-directory: reference_integration
-
-      - name: Build AutoSD Image
-        if: false
-        uses: ./.github/actions/aib
-        with:
-          manifest: image.aib.yml
-          distro: autosd10
-          mode: package
-          target: qemu
-          export: qcow2
-          extra_args: '--define-file vars-devel.yml --define-file vars.yml'
-          disk_path: disk.qcow2
-          base_dir: os_images
-
-      - name: Enable KVM group perms
-        if: false
-        run: |
-          sudo usermod -aG kvm $USER
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          sudo modprobe vhost_vsock
-
-      - name: Install Jumpstarter
-        if: false
-        run: |
-          # use it once qemu changes are published
-          # pip install --extra-index-url https://pkg.jumpstarter.dev/ jumpstarter-all
-          git clone -b main https://github.com/jumpstarter-dev/jumpstarter.git /tmp/jumpstarter
-          make -C /tmp/jumpstarter/python build
-          pip install /tmp/jumpstarter/python/dist/*.whl
-
-      - name: Test QEMU Image
-        if: false
-        run: |
-          SSH_PASSWORD=password jmp shell --exporter-config jumpstarter/qemu.exporter.yaml < jumpstarter/qemu.cmd.sh
-
-          exit $(cat /tmp/jmp.rc.txt)
+        working-directory: tests

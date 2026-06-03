@@ -50,7 +50,7 @@ Project Layout
 +---------------------------------------------+------------------------------------------------------------+
 | ``toolchain/``                              | Bazel toolchain to build modules using AutoSD's tooling    |
 +---------------------------------------------+------------------------------------------------------------+
-| ``reference_integration/``                  | Tooling to run AutoSD in different targets, such as QEMU   |
+| ``tests/``                                  | Build files for testing the toolchain on top of S-Core     |
 +---------------------------------------------+------------------------------------------------------------+
 | ``docs/``                                   | Documentation                                              |
 +---------------------------------------------+------------------------------------------------------------+
@@ -77,7 +77,7 @@ Documentation is dealt as a top level "folder" and bazel should be used to build
 
 .. code-block:: shell
 
-   bazel run //:docs 
+   bazel run //:docs
 
 
 You can then proceed to open ``_build/index.html`` in a web browser.
@@ -94,12 +94,6 @@ In case you want to run a clean build from scratch, run the following command be
 
 Toolchain
 ~~~~~~~~~
-
-TBD
-
-
-Reference Integration
-~~~~~~~~~~~~~~~~~~~~~
 
 TBD
 
