@@ -10,5 +10,9 @@
   {
     "version": "pr-41",
     "url": "https://eclipse-score.github.io/inc_os_autosd/pr-41/"
+  },
+  {
+    "version": "pr-49",
+    "url": "https://eclipse-score.github.io/os_autosd/pr-49/"
   }
 ]
