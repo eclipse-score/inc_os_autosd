@@ -1,6 +1,6 @@
 ..
    # *******************************************************************************
-   # Copyright (c) 2024 Contributors to the Eclipse Foundation
+   # Copyright (c) 2026 Contributors to the Eclipse Foundation
    #
    # See the NOTICE file(s) distributed with this work for additional
    # information regarding copyright ownership.
@@ -12,100 +12,92 @@
    # SPDX-License-Identifier: Apache-2.0
    # *******************************************************************************
 
-CentOS AutoSD 9 Development Target
-==================================
-
-This documentation describes the structure, usage and configuration of AutoSD in Eclipse S-CORE.
+OS AutoSD
+=========
 
 .. contents:: Table of Contents
-   :depth: 2
    :local:
 
 Overview
 --------
 
-This repsotory provides the recommended setup to build and run S-CORE in an AutoSD image.
+This repository contains Bazel tools that are required to integrate AutoSD's toolchains into Eclipse S-CORE in order
+to build modules for both x86_64 and aarch64.
 
-This repository provides a standardized setup for projects using **C++** or **Rust** and **Bazel** as a build system.
-It integrates best practices for build, test, CI/CD and documentation.
-
-Requirements
-------------
-
-.. stkh_req:: CentOS AutoSD 9 Development Target
-   :id: stkh_req__supported_platforms__autosd_dev
-   :reqtype: Functional
-   :security: NO
-   :safety: QM
-   :rationale: CentOS AutoSD 9 is required as a development target.
-   :status: valid
-
-Project Layout
---------------
-
-+---------------------------------------------+------------------------------------------------------------+
-| File/Folder                                 | Description                                                |
-+=============================================+============================================================+
-| ``README.md``                               | Repository short description and instructions              |
-+---------------------------------------------+------------------------------------------------------------+
-| ``toolchain/``                              | Bazel toolchain to build modules using AutoSD's tooling    |
-+---------------------------------------------+------------------------------------------------------------+
-| ``tests/``                                  | Build files for testing the toolchain on top of S-Core     |
-+---------------------------------------------+------------------------------------------------------------+
-| ``docs/``                                   | Documentation                                              |
-+---------------------------------------------+------------------------------------------------------------+
-| ``.github/workflows/``                      | CI/CD pipelines                                            |
-+---------------------------------------------+------------------------------------------------------------+
-| ``.vscode/``                                | Recommended VS Code settings                               |
-+---------------------------------------------+------------------------------------------------------------+
-| ``.bazelrc``, ``MODULE.bazel``, ``BUILD``   | Bazel configuration & settings                             |
-+---------------------------------------------+------------------------------------------------------------+
-| ``project_config.bzl``                      | Project-specific metadata for Bazel macros                 |
-+---------------------------------------------+------------------------------------------------------------+
-| ``LICENSE``                                 | Licensing information                                      |
-+---------------------------------------------+------------------------------------------------------------+
-| ``CONTRIBUTION.md``                         | Contribution guidelines                                    |
-+---------------------------------------------+------------------------------------------------------------+
-
-Quick Start
------------
-
-Documentation
-~~~~~~~~~~~~~
-
-Documentation is dealt as a top level "folder" and bazel should be used to build it by running:
-
-.. code-block:: shell
-
-   bazel run //:docs
-
-
-You can then proceed to open ``_build/index.html`` in a web browser.
-
-In case you want to run a clean build from scratch, run the following command before triggering a new build:
-
-
-.. code-block:: shell
-
-   bazel clean --expunge && \
-   rm -rf .cache/ && \
-   rm MODULE.bazel.lock && \
-    rm -rf _build
-
-Toolchain
-~~~~~~~~~
-
-TBD
-
-Configuration
+Module Layout
 -------------
 
-The `project_config.bzl` file defines metadata used by Bazel macros.
+The module template includes the following top-level structure:
 
-Example:
+.. code-block:: text
 
-.. code-block:: python
+    <module_name>/                      # Root folder of the module, subfolder only if more than one module exists in the repository
+    ├── .github/
+    │   └── workflows/                  # CI/CD pipelines
+    ├── docs/                           # Global documentation of the module
+    │   ├── manuals/                    # Module manual, integration manual, table of assumptions of use,
+    │   ├── release/                    # Module release note [wp__module_sw_release_note]
+    │                                   #   module verifications [wp__verification_module_ver_report],
+    ├── examples/                       # Usage examples for the module / features
+    ├── tests/                          # Module tests
+    ├── toolchain/                      # AutoSD toolchains defintions
+    ├── MODULE.bazel                    # Bazel module definition
+    ├── BUILD                           # Root build rules
+    ├── project_config.bzl              # Project metadata used by Bazel macros
+    └── README.md                       # Entry point of the repository
 
-   PROJECT_CONFIG = {
-       "asil_level": "QM"
-   }
+Module / Feature documentation overview
++++++++++++++++++++++++++++++++++++++++
+
+.. toctree::
+
+   manuals/index
+   release/index
+
+Examples
+--------
+
+MODULE.bazel
+++++++++++++
+
+.. code-block:: starlark
+
+    bazel_dep(name = "score_bazel_cpp_toolchains", version = "0.5.5")
+
+    gcc = use_extension("@score_bazel_cpp_toolchains//extensions:gcc.bzl", "gcc", dev_dependency = True)
+
+    gcc.toolchain(
+      name = "score_autosd10_x86_64_toolchain",
+      runtime_ecosystem = "autosd10",
+      target_cpu = "x86_64",
+      target_os = "linux",
+      use_default_package = True,
+    )
+
+    gcc.toolchain(
+      name = "score_autosd10_aarch64_toolchain",
+      runtime_ecosystem = "autosd10",
+      target_cpu = "aarch64",
+      target_os = "linux",
+      use_default_package = True,
+    )
+
+    use_repo(
+      gcc,
+      "score_autosd10_aarch64_toolchain"
+      "score_autosd10_x86_64_toolchain",
+    )
+
+
+.bazelrc
+++++++++
+
+.. code-block:: ini
+
+   build:autosd-x86_64 --force_pic
+   build:autosd-x86_64 --platforms=@score_bazel_platforms//:x86_64-linux-autosd10
+   build:autosd-x86_64 --extra_toolchains=@score_autosd10_x86_64_toolchain//:x86_64-linux-autosd10
+
+   build:autosd-aarch64 --force_pic
+   build:autosd-aarch64 --platforms=@score_bazel_platforms//:aarch64-linux-autosd10
+   build:autosd-aarch64 --extra_toolchains=@score_autosd10_aarch64_toolchain//:aarch64-linux-autosd10
