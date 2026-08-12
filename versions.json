@@ -4,15 +4,7 @@
     "url": "https://eclipse-score.github.io/os_autosd/main/"
   },
   {
-    "version": "pr-36",
-    "url": "https://eclipse-score.github.io/inc_os_autosd/pr-36/"
-  },
-  {
     "version": "pr-41",
     "url": "https://eclipse-score.github.io/inc_os_autosd/pr-41/"
-  },
-  {
-    "version": "pr-50",
-    "url": "https://eclipse-score.github.io/os_autosd/pr-50/"
   }
 ]
