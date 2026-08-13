@@ -15,10 +15,12 @@ name: Generate Toolchain Tarball
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   generate-toolchain-tarball:
-    name: Generate Toolchain Tarball
     runs-on: ubuntu-latest
     permissions:
       contents: write # Push tag
@@ -26,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install System Dependencies
         run: |
@@ -39,21 +41,71 @@ jobs:
           ./setup_toolchain.sh --tarball "autosd-toolchain-aarch64.tar.gz" aarch64
         working-directory: toolchain/autosd_10_gcc
 
-      - name: Delete existing continuous release (if any)
+      - name: Store Toolchain Tarball
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: eclipse-score-autosd-toolchain-tarballs
+          path: toolchain/autosd_10_gcc/autosd-toolchain-*.tar.gz
+
+  release-toolchain-tarball:
+    needs: generate-toolchain-tarball
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Set Release Name
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "RELEASE_NAME=continuous" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_NAME=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Prepare
+        run: |
+          mkdir -p _autosd_artifacts/
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: eclipse-score-autosd-toolchain-tarballs
+          merge-multiple: true
+          path: _autosd_artifacts/
+
+      - name: Check Build Directory
+        run: |
+          stat _autosd_artifacts/autosd-toolchain-aarch64.tar.gz
+          stat _autosd_artifacts/autosd-toolchain-x86_64.tar.gz
+
+      - name: Delete existing continuous release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.RELEASE_NAME == 'continuous'
         run: |
           gh release delete continuous --yes || true
           git tag -d continuous || true
           git push origin :refs/tags/continuous || true
 
-      - name: Upload to continuous release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: continuous
-          name: Continuous Build
-          prerelease: true
-          files: |
-            toolchain/autosd_10_gcc/autosd-toolchain-x86_64.tar.gz
-            toolchain/autosd_10_gcc/autosd-toolchain-aarch64.tar.gz
-          fail_on_unmatched_files: true
+      - name: Create New Release from Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: env.RELEASE_NAME != 'continuous'
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+          --title "$GITHUB_REF_NAME" \
+          --generate-notes
+
+      - name: Add Tarballs to GH Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          tag_name: ${{ env.RELEASE_NAME }}
+          name: ${{ env.RELEASE_NAME }}
+          files: |
+            _autosd_artifacts/autosd-toolchain-aarch64.tar.gz
+            _autosd_artifacts/autosd-toolchain-x86_64.tar.gz
+          fail_on_unmatched_files: true
+          prerelease: false

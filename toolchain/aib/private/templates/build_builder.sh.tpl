@@ -1,5 +1,6 @@
+#!/bin/bash
 # *******************************************************************************
-# Copyright (c) 2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2026 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -10,15 +11,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
+set -e
 
-name: Copyright checks
-on:
-  pull_request:
-    types: [opened, reopened, synchronize]
-  merge_group:
-    types: [checks_requested]
-jobs:
-  copyright-check:
-    uses: eclipse-score/cicd-workflows/.github/workflows/copyright.yml@c1c90b1a82a1fab0fc202979dde6686b2162d5a8 # v0.0.0
-    with:
-      bazel-target: "run --lockfile_mode=error //:copyright.check"
+export STORAGE_DIR=$(mktemp -d "$PWD/.container-storage-XXX")
+export TMPDIR=$(mktemp -d "$PWD/.tmp-XXX")
+export AIB_TMPDIR_BASE=$TMPDIR
+
+mkdir -p "$TMPDIR" "$STORAGE_DIR"
+cleanup() {
+    rm -rf "$TMPDIR"
+    podman unshare rm -rf "$STORAGE_DIR"
+}
+trap cleanup EXIT
+
+"$3" build-builder \
+    --user-container --container-storage "$STORAGE_DIR" --distro "$2" \
+    --if-needed --oci-archive "$1"

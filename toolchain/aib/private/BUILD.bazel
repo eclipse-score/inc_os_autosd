@@ -10,23 +10,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
-name: License check preparation
-on:
-  pull_request_target:
-    types: [opened, reopened, synchronize]
-  merge_group:
-    types: [checks_requested]
+package(default_visibility = ["//:__subpackages__"])
 
-permissions:
-  pull-requests: write
-  issues: write
-
-
-jobs:
-  license-check:
-    uses: eclipse-score/cicd-workflows/.github/workflows/license-check.yml@c1c90b1a82a1fab0fc202979dde6686b2162d5a8 # v0.0.0
-    with:
-      repo-url: "${{ github.server_url }}/${{ github.repository }}"
-    secrets:
-      dash-api-token: ${{ secrets.ECLIPSE_GITLAB_API_TOKEN }}
+bzl_library(
+    name = "aib_rule",
+    srcs = [
+        "aib_manifest.bzl",
+        "aib_rule.bzl",
+        "manifest_auth.bzl",
+        "manifest_image.bzl",
+        "manifest_kernel.bzl",
+        "manifest_network.bzl",
+        "manifest_partition.bzl",
+        "manifest_utils.bzl",
+    ],
+)

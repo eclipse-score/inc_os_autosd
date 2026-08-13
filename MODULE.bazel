@@ -10,10 +10,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
-module(
-    name = "os_autosd",
-    version = "0.0.1",
-)
+module(name = "os_autosd")
 
 # Platform definitions
 bazel_dep(name = "platforms", version = "0.0.11")
@@ -43,7 +40,7 @@ bazel_dep(name = "aspect_rules_lint", version = "1.4.4")
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.0.2")
 
 #docs-as-code
-bazel_dep(name = "score_docs_as_code", version = "4.0.3")
+bazel_dep(name = "score_docs_as_code", version = "4.6.0")
 
 # AutoSD GCC Toolchains
 autosd_10_gcc = use_extension("//toolchain/autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")

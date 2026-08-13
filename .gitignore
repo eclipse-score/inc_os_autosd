@@ -49,7 +49,7 @@ user.bazelrc
 .ruff_cache
 
 # docs:incremental and docs:ide_support build artifacts
-/_build
+_build
 
 # Vale - editorial style guide
 .vale.ini
@@ -63,3 +63,4 @@ styles/
 __pycache__/
 /.coverage
 *.tar.gz
+ubproject.toml

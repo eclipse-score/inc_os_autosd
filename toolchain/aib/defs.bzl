@@ -10,23 +10,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
+"""Public API for rules_aib."""
 
-name: License check preparation
-on:
-  pull_request_target:
-    types: [opened, reopened, synchronize]
-  merge_group:
-    types: [checks_requested]
+load("//private:aib_manifest.bzl", _aib_manifest = "aib_manifest")
+load("//private:aib_rule.bzl", _aib_build = "aib_build", _aib_build_builder = "aib_build_builder")
 
-permissions:
-  pull-requests: write
-  issues: write
-
-
-jobs:
-  license-check:
-    uses: eclipse-score/cicd-workflows/.github/workflows/license-check.yml@c1c90b1a82a1fab0fc202979dde6686b2162d5a8 # v0.0.0
-    with:
-      repo-url: "${{ github.server_url }}/${{ github.repository }}"
-    secrets:
-      dash-api-token: ${{ secrets.ECLIPSE_GITLAB_API_TOKEN }}
+aib_build = _aib_build
+aib_build_builder = _aib_build_builder
+aib_manifest = _aib_manifest
