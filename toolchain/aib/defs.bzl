@@ -12,8 +12,8 @@
 # *******************************************************************************
 """Public API for rules_aib."""
 
-load("//private:aib_manifest.bzl", _aib_manifest = "aib_manifest")
-load("//private:aib_rule.bzl", _aib_build = "aib_build", _aib_build_builder = "aib_build_builder")
+load("//toolchain/aib/private:aib_manifest.bzl", _aib_manifest = "aib_manifest")
+load("//toolchain/aib/private:aib_rule.bzl", _aib_build = "aib_build", _aib_build_builder = "aib_build_builder")
 
 aib_build = _aib_build
 aib_build_builder = _aib_build_builder

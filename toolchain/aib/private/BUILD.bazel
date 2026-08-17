@@ -27,3 +27,14 @@ bzl_library(
         "manifest_utils.bzl",
     ],
 )
+
+exports_files([
+    "aib_manifest.bzl",
+    "aib_rule.bzl",
+    "manifest_auth.bzl",
+    "manifest_image.bzl",
+    "manifest_kernel.bzl",
+    "manifest_network.bzl",
+    "manifest_partition.bzl",
+    "manifest_utils.bzl",
+])

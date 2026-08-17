@@ -17,5 +17,4 @@ exports_files(
         "build_builder.sh.tpl",
         "build_image.sh.tpl",
     ],
-    visibility = ["//private:__pkg__"],
 )

@@ -153,7 +153,7 @@ aib_build_builder = rule(
             doc = "Name of the image (defaults to rule name)",
         ),
         "_build_builder_template": attr.label(
-            default = "//private/templates:build_builder.sh.tpl",
+            default = "//toolchain/aib/private/templates:build_builder.sh.tpl",
             allow_single_file = True,
         ),
     },
@@ -185,7 +185,7 @@ aib_build = rule(
             doc = "The board to target, defaults to qemu.",
         ),
         "_build_image_template": attr.label(
-            default = "//private/templates:build_image.sh.tpl",
+            default = "//toolchain/aib/private/templates:build_image.sh.tpl",
             allow_single_file = True,
         ),
         "_cpu_aarch64": attr.label(
