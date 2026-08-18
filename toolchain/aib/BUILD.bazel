@@ -17,5 +17,5 @@ package(default_visibility = ["//visibility:public"])
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
-    deps = ["//private:aib_rule"],
+    deps = ["//toolchain/aib/private:aib_rule"],
 )
