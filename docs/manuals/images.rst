@@ -145,8 +145,8 @@ Bootc will apply all the missing/new layers into the host machine from the speci
 Building Disk Images with Bazel
 -------------------------------
 
-It's possible to build AutoSD disk images (qcow, img and simg) using Bazel.
-The **os_autosd** module needs to be used as a Bazel direct depenency to do so.
+It's possible to build AutoSD disk images (QCOW2, VHD, and raw) using Bazel.
+The **os_autosd** module needs to be used as a Bazel direct dependency to do so.
 
 The Bazel rule uses `automotive-image-builder(AIB) <https://sigs.centos.org/automotive/latest/getting-started/about-automotive-image-builder.html>`_,
 a tool provided by the CentOS Automotive SIG to build AutoSD images.
