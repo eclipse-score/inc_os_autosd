@@ -21,8 +21,8 @@ Warnings as Errors
 The following table lists all warnings that will throw an error by default.
 
 
-.. csv-table:: Compiler Warning Messages
-   :header: "Option", "Status / Default Value"
+.. csv-table:: 
+   :header: "Flags", "Status / Default Value"
    :widths: 50, 50
 
    "--all-warnings", "-Wall"
