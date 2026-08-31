@@ -18,6 +18,7 @@ Manuals
 .. toctree::
 
    cpp_toolchain
+   cpp_toolchain_flags
    rpm_toolchain
    rust_toolchain
    images
